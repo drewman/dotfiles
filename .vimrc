@@ -1,0 +1,14 @@
+syntax on
+set nowrap
+set background=dark
+set number
+set ai
+set smartindent
+set nocompatible
+set expandtab
+set tabstop=4
+set shiftwidth=4
+set showmatch
+set title
+set ruler
+set incsearch
