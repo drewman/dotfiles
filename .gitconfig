@@ -1,6 +1,6 @@
 [user]
 	name = Drew Bruce
-	email = drubruce@gmail.com
+	email = dbruce@concentricsky.com
 
 [color]
 	diff = auto
@@ -10,8 +10,11 @@
 
 [core]
 	editor = vim
-	excludesfile = ~/.gitexcludes
+	excludesfile = /Users/dbruce/.gitexcludes
 
 [alias]
 	co = checkout
 	ci = commit
+
+[init]
+	templatedir = /Users/dbruce/.git-template/

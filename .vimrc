@@ -1,7 +1,12 @@
-syntax on
+call pathogen#infect()
+
 set nowrap
+
 set background=dark
+
+syntax on
 set number
+filetype plugin on
 set ai
 set smartindent
 set nocompatible
@@ -12,3 +17,5 @@ set showmatch
 set title
 set ruler
 set incsearch
+set mouse=a
+
