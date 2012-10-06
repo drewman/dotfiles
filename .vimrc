@@ -1,5 +1,3 @@
-call pathogen#infect()
-
 set nowrap
 
 set background=dark
