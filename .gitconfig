@@ -10,7 +10,7 @@
 
 [core]
 	editor = vim
-	excludesfile = /Users/dbruce/.gitexcludes
+	excludesfile = /Users/dbruce/.gitignore
 
 [alias]
 	co = checkout
