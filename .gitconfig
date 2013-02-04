@@ -15,6 +15,7 @@
 [alias]
 	co = checkout
 	ci = commit
+    st = status -s
 
 [init]
 	templatedir = /Users/dbruce/.git-template/
