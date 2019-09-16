@@ -11,7 +11,7 @@ fi
 echo "Installing packages I always want"
 brew update
 brew install wget
-brew install vim
+brew install awscli
 brew install bash-completion
 brew install pyenv
 brew install pipenv
