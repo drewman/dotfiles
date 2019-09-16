@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Install xcode cli tools"
+xcode-select --install
+
 if [ -z $(which brew) ]
     echo "Installing homebrew"
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
