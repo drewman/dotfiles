@@ -13,9 +13,10 @@ export WORKON_HOME=$HOME/envs
 export GIT_PS1_SHOWDIRTYSTATE=true
 export GIT_PS1_SHOWSTASHSTATE=true
 export GIT_PS1_SHOWUNTRACKEDFILES=true
-
-#git prompt
 [[ -r $HOME/etc/git-prompt.sh ]] && source $HOME/etc/git-prompt.sh
+
+# set author email
+export GIT_AUTHOR_EMAIL=
 
 # colorful terminal
 PS1='\[\e[1;36m\][\[\e[1;34m\]\u@\h \[\e[1;33m\]\W\[\e[1;31m\]$(__git_ps1)\[\e[1;36m\]]\[\e[1;35m\] $ \[\e[0m\]'
