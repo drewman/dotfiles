@@ -7,6 +7,7 @@ export PYTHONDONTWRITEBYTECODE=1
 # virtualenv{wrapper}
 export VIRTUALENV_USE_DISTRIBUTE=true
 export WORKON_HOME=$HOME/envs
+export VIRTUALENVWRAPPER_PYTHON=$HOME/.pyenv/shims/python
 [[ -r $HOME/.local/bin/virtualenvwrapper.sh ]] && source $HOME/.local/bin/virtualenvwrapper.sh
 
 # git prompt
@@ -45,7 +46,7 @@ alias la='ls -A'
 set -o vi
 
 # auto-completions:
-[[ -r $HOME/etc/git-completion]] && source $HOME/etc/git-completion.bash
+[[ -r $HOME/etc/git-completion ]] && source $HOME/etc/git-completion.bash
 [[ -r $HOME/etc/django_bash_completion ]] && source $HOME/etc/django_bash_completion
 [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && source "/usr/local/etc/profile.d/bash_completion.sh"
 
