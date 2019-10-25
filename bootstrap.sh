@@ -15,6 +15,12 @@ rsync --exclude ".git/" \
 if [[ $(uname) -eq "Darwin" ]]
 then
     ./brew.sh
+    #sdkman confirmed useful :D
+    curl -s "https://get.sdkman.io" | bash
 fi
 
-source ~/.bash_profile
+source ~/.zshrc
+
+echo Remember to add $(which zsh) to your /etc/shells
+echo then run: chsh -s $(which zsh)
+

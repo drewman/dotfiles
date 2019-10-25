@@ -17,6 +17,7 @@ brew install bash-completion
 brew install pyenv
 brew install pipenv
 brew install virtualenvwrapper
+brew install zsh
 
 mkdir $HOME/etc
 if [ ! -f $HOME/etc/git-prompt.sh ]
