@@ -17,3 +17,4 @@ set ruler
 set incsearch
 set mouse=a
 
+imap jk <Esc>
