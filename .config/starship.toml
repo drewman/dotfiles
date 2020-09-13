@@ -1,0 +1,29 @@
+add_newline = false
+
+[line_break]
+disabled = true
+
+[directory]
+prefix = ""
+style = "bold #fe8019"
+
+[cmd_duration]
+prefix = ""
+style = "bold #b8bb26"
+min_time = 60_000
+
+[character]
+symbol = "➜"
+vicmd_symbol = "V"
+style_success = "bold bright-blue"
+style_failure = "bold bright-red"
+
+[battery]
+disabled = true
+
+[git_branch]
+symbol = "🌱"
+
+[python]
+pyenv_prefix = "venv "
+
