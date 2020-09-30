@@ -11,11 +11,6 @@
       gc-cons-percentage 0.6
       auto-window-vscroll nil)
 
-;; pulled from better-defaults.el
-(require 'uniquify)
-(setq uniquify-buffer-name-style 'forward)
-
-;; end of better-defaults.el
 
 ;; Setup use-package
 (require 'package)
@@ -144,6 +139,11 @@
 ;  (setq golden-ratio-exclude-modes 'magit-mode)
 ;  :config
 ;  (golden-ratio-mode 1))
+
+;; better handling of duplicate buffer names
+(use-package uniquify
+  :init
+  (setq uniquify-buffer-name-style 'forward))
 
 ;; Completion
 ;; Would be interesting to try the minimalist approach of using icomplete
