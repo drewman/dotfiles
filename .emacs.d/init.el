@@ -163,6 +163,7 @@
          ("C-l" . ivy-alt-done)
          ("C-j" . ivy-next-line)
          ("C-k" . ivy-previous-line)
+         ("C-o" . ivy-dispatching-done)
          :map ivy-switch-buffer-map
          ("C-k" . ivy-previous-line)
          ("C-j" . ivy-next-line)
