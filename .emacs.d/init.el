@@ -199,7 +199,9 @@
 
 (use-package magit
   :init
-  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1))
+  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+  :config
+  (add-hook 'with-editor-mode-hook 'evil-insert-state))
 
 (use-package projectile
   :init
