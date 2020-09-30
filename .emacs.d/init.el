@@ -73,8 +73,8 @@
 
 ;; turn my lisp into fruit loops
 (use-package rainbow-delimiters
-  :config
-  (rainbow-delimiters-mode))
+  :hook (prog-mode . rainbow-delimiters-mode))
+
 ;; MODELINE
 (use-package doom-modeline
   :hook (after-init . doom-modeline-mode)
