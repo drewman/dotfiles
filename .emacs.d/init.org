@@ -143,10 +143,6 @@
   :init
   (setq uniquify-buffer-name-style 'forward))
 
-(use-package dired
-  :bind (:map dired-mode-map
-         ("c" . find-file)))
-
 ;; Completion
 ;; Would be interesting to try the minimalist approach of using icomplete
 ;; https://protesilaos.com/dotemacs/#h:b6b13f4f-91f5-416d-9934-b51b4d87770c

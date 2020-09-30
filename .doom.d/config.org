@@ -1,0 +1,208 @@
+* Config
+:PROPERTIES:
+:header-args: :results output silent
+:END:
+** Name & email
+#+BEGIN_SRC elisp
+(setq user-full-name "Drew Bruce"
+      user-mail-address "drew@drewbruce.com")
+(defvar my/work-email "drew.bruce@nike.com")
+#+END_SRC
+** DOOM UI
+#+BEGIN_SRC elisp
+(setq doom-font (font-spec :family "JetBrains Mono" :size 14))
+(setq doom-theme 'doom-tomorrow-night)
+(setq display-line-numbers-type t)
+#+END_SRC
+** Org
+*** Directories
+#+BEGIN_SRC elisp
+(setq org-directory "~/org/")
+(setq org-ellipsis " ▼ ")
+(setq org-roam-directory "~/org/notes")
+(setq org-agenda-files (cons "~/.doom.d/config.org"(directory-files-recursively "~/org/notes" "\\.org$")))
+#+END_SRC
+*** Links
+Set link file path to always use absolute paths. This should help links not break when refiling (so long as files never move :)
+#+BEGIN_SRC elisp
+(setq org-link-file-path-type "absolute")
+#+END_SRC
+*** Deft
+#+BEGIN_SRC elisp
+(setq deft-directory "~/org")
+(setq deft-extensions '("txt" "tex" "org"))
+(setq deft-recursive t)
+#+END_SRC
+*** Refiling
+Allow refiling to anything in the org directory, up to one bullet point. More bullet points makes refiling slow.
+#+BEGIN_SRC elisp
+(defvar my/refile-targets
+  (mapcar 'abbreviate-file-name
+          (split-string
+           (shell-command-to-string "find -L ~/org -name '*.org'") "\n")))
+(setq org-refile-targets '((my/refile-targets :maxlevel . 1)))
+#+END_SRC
+*** Keybinds
+#+BEGIN_SRC elisp
+(map! :after org
+      :map org-mode-map
+      :n :desc "refile headline" "C-c r" #'org-refile
+      :n :desc "insert snippet" "C-c s" #'yas-insert-snippet
+      :n :desc "insert link & goto" "C-c i" #'org-roam-insert
+      :n :desc "insert link" "C-c I" #'org-roam-insert-immediate)
+#+END_SRC
+*** Todos
+I dislike dooms todo system, so set it back to the default (TODO, DONE).
+#+BEGIN_SRC elisp
+(after! org
+    (setq org-todo-keywords '((sequence "TODO" "DONE"))))
+#+END_SRC
+*** Capture Templates
+#+BEGIN_SRC elisp
+(after! org-roam
+    (setq org-roam-capture-templates
+        '(
+            ("b" "bullet" entry (function org-roam--capture-get-point)
+            "* %?\n"
+            :file-name "inbox.org"
+            :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
+            :unnarrowed t)
+            ("t" "todo" entry (function org-roam--capture-get-point)
+            "* TODO %?\n"
+            :file-name "inbox.org"
+            :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
+            :unnarrowed t)
+            ("s" "slip" plain (function org-roam--capture-get-point)
+            "%?"
+            :file-name "${slug}"
+            :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
+            :unnarrowed t)
+            ))
+
+    (setq org-roam-dailies-capture-templates
+        '(
+            ("d" "daily" plain (function org-roam--capture-get-point)
+            ""
+            :immediate-finish t
+            :file-name "%<%Y-%m-%d>"
+            :head "#+title: %<%Y-%m-%d>\n#+roam_tags\n\n")
+        )))
+#+END_SRC
+*** Babel
+When running org-babel-tangle with ':comments org|both' strip out properties from comments.
+I have no desire to include Emacs specific properties as comments in my script.
+#+BEGIN_SRC elisp
+(defun my/remove-properties (str)
+    (string-join (seq-filter (lambda (st) (not (string-prefix-p ":" st))) (split-string str "\n")) "\n"))
+(setq org-babel-process-comment-text 'my/remove-properties)
+#+END_SRC
+*** Export to confluence
+"Confluence markdown" is dissimilar enough to standard markdown that I want to be able to export directly to confluence markup.
+#+BEGIN_SRC elisp
+(require 'ox-confluence)
+#+END_SRC
+** Global binds
+The ESC key is too far away. 'jk' is much easier to move to normal mode. (This is the doom default but included for specificity)
+The doom default is to exclude for visual mode (as well as normal, multiedit, emacs, and motion) but I don't want to use it in visual mode as well. I have rewrite ~evil-escape-excluded-states~ based on the way doom configures evil-escape.
+#+BEGIN_SRC elisp
+(after! evil-escape
+        (setq evil-escape-excluded-states '(normal multiedit emacs motion))
+        (setq evil-escape-key-sequence "jk"))
+#+END_SRC
+Convenience binds for all modes.
+#+BEGIN_SRC elisp
+(map! :leader
+      :desc "M-x" "x" #'counsel-M-x
+      :desc "other-window" "w o" #'other-window
+      :desc "org-capture" "n n" #'org-roam-capture
+      :desc "org-today" "n j" #'org-roam-dailies-today)
+#+END_SRC
+Set alt-leader to C-space instead of M-space to not conflict with my system binds.
+#+BEGIN_SRC elisp
+(setq doom-leader-alt-key "C-SPC")
+(setq doom-localleader-alt-key "C-SPC m")
+#+END_SRC
+** Time stamps
+Add time-stamps to Time-stamp: <> (in first 8 lines) when writing files
+Not working very well for me ATM. Exporting timestamps is awkward.)
+#+BEGIN_SRC elisp
+(after! time-stamp
+  (add-hook 'write-file-functions 'time-stamp))
+#+END_SRC
+*** TODO [#C] Change time-stamp to '#+LAST_MODIFIED'
+https://org-roam.discourse.group/t/update-a-field-last-modified-at-save/321
+discusses a solution
+** Elfeed
+Elfeed goodies make elfeed look a lot nicer. Since it's not included with doom, need to run the setup function.
+#+BEGIN_SRC elisp
+(elfeed-goodies/setup)
+#+END_SRC
+** Scratch
+*** Initial mode
+Doom sets the scratch initial major mode to fundamental which sucks for lisp autocompletion.
+Instead of changing the mode everytime, just start in lisp mode.
+#+BEGIN_SRC elisp
+(setq initial-major-mode 'lisp-interaction-mode)
+#+END_SRC
+*** Initial message
+Put in initial message in the scratch buffer to help me remember stuff.
+#+BEGIN_SRC elisp
+(setq initial-scratch-message "\
+;; This buffer is for notes you don't want to save, and for Lisp evaluation.
+;; If you want to create a file, visit that file with C-x C-f,
+;; then enter the text in that file's own buffer.")
+#+END_SRC
+** Modeline
+*** Time
+Trying having the time in the modeline to see if I like it.
+#+BEGIN_SRC elisp
+(display-time-mode 1)
+#+END_SRC
+** Shell
+*** exec-path-from-shell
+I've added exec-path-from-shell to (hopefully) resolve some of the issues where code is producing a different result in emacs.
+Since, it's not included with doom, we have to initialize it (for macos and linux systems only).
+#+BEGIN_SRC elisp
+(after! exec-path-from-shell
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+#+END_SRC
+** IRC
+Setup circe with password from ~/.private.el
+#+BEGIN_SRC elisp
+(load! "~/.private.el")
+
+(after! circe
+  (setq circe-network-options
+      `(("Freenode"
+         :nick "bobtheorc"
+         :channels ("#emacs" "#emacs-circe")
+         :nickserv-password ,freenode-password))))
+
+#+END_SRC
+* Packages
+#+BEGIN_SRC elisp :tangle packages.el
+(package! gh-md)
+(package! elfeed-goodies)
+(package! exec-path-from-shell)
+(package! terraform-mode)
+#+END_SRC
+
+* Helpful Doom Stuff
+** Macros
+*** load!
+for loading external *.el files relative to this one
+*** use-package
+for configuring packages
+*** after!
+for running code after a package has loaded
+*** add-load-path!
+for adding directories to the `load-path', where Emacs
+looks when you load packages with `require' or `use-package'.
+*** map!
+for binding new keys
+** Shortcuts
+*** K
+documentation on symbol
+*** gd
+symbol definition
