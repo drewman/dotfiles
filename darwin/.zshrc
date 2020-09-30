@@ -5,11 +5,6 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# OH-MY-ZSH FILLER:
-# If you come from bash you might have to change your $PATH.
-export PATH=$HOME/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin
-export ZSH="/Users/dbruc1/.oh-my-zsh"
-
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
@@ -72,7 +67,6 @@ fi
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git python pyenv docker colored-man-pages cp vi-mode brew aws django gitfast pip sdk)
-HIST_STAMPS="mm/dd/yyyy"
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
@@ -95,26 +89,6 @@ source $ZSH/oh-my-zsh.sh
 #
 
 # CUSTOM:
-# environment variables
-export DEFAULT_USER=dbruc1
-export PYTHONDONTWRITEBYTECODE=1
-export EDITOR='vim'
-export WORKON_HOME=$HOME/.pyenv/versions
-export KEYTIMEOUT=1
-export PATH="/usr/local/sbin:$PATH:$HOME/.emacs.d/bin:$HOME/bin"
-
-# history
-HISTFILE="$HOME/.zsh_history"
-HISTSIZE=10000000
-SAVEHIST=10000000
-setopt BANG_HIST                 # Treat the '!' character specially during expansion.
-setopt EXTENDED_HISTORY          # Write the history file in the ":start:elapsed;command" format.
-setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
-setopt SHARE_HISTORY             # Share history between all sessions.
-setopt HIST_IGNORE_ALL_DUPS      # Delete old recorded entry if new entry is a duplicate.
-setopt HIST_IGNORE_SPACE         # Dont record an entry starting with a space.
-setopt HIST_REDUCE_BLANKS        # Remove superfluous blanks before recording entry.
-
 
 # aliases:
 alias ls="exa -F"
@@ -123,20 +97,10 @@ alias la='exa -aF'
 alias lt='exa -T'
 alias zshconfig="vim ~/.zshrc"
 
-AGNOSTER_PROMPT_SEGMENTS[1]=
+# removes the second part of the agnoster prompt
+#AGNOSTER_PROMPT_SEGMENTS[1]=
 
-# autoenv
-source /usr/local/opt/autoenv/activate.sh
-export AUTOENV_ENABLE_LEAVE="t"
-
-# pyenv
-[[ -n $(which pyenv) ]] && eval "$(pyenv init -)"
-if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
-
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="/Users/dbruc1/.sdkman"
-[[ -s "/Users/dbruc1/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/dbruc1/.sdkman/bin/sdkman-init.sh"
-
+# function to make TMUX display colors better
 vterm_printf(){
     if [ -n "$TMUX" ]; then
         # Tell tmux to pass the escape sequences through
@@ -150,10 +114,18 @@ vterm_printf(){
     fi
 }
 
+# autoenv
+if [ -f /usr/local/opt/autoenv/activate.sh ]; then
+    source /usr/local/opt/autoenv/activate.sh
+fi
 
-
-#fortune | cowthink -f turtle
-#screenfetch
+# pyenv
+[[ -n $(which pyenv) ]] && eval "$(pyenv init -)"
+if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+[[ -s "/Users/dbruc1/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/dbruc1/.sdkman/bin/sdkman-init.sh"
+
