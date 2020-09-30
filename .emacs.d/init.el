@@ -154,8 +154,6 @@
 
 (use-package ivy
   :init
-  (setq counsel-describe-function-function #'helpful-callable)
-  (setq counsel-describe-variable-function #'helpful-variable)
   (setq ivy-use-virtual-buffers t
         ivy-count-format " (%d/%d) ")
   :bind (:map ivy-minibuffer-map
@@ -194,7 +192,9 @@
   :config
   (which-key-mode))
 
-(use-package helpful)
+(use-package helpful
+  (setq counsel-describe-function-function #'helpful-callable)
+  (setq counsel-describe-variable-function #'helpful-variable))
 
 (use-package company
   :config
