@@ -55,7 +55,6 @@
 (use-package modus-vivendi-theme
   :init
   (setq modus-vivendi-theme-bold-constructs t) (setq modus-vivendi-theme-slanted-constructs t)
-  (setq modus-vivendi-theme-mode-line 'moody)
   (setq modus-vivendi-theme-completions 'opinionated)
   (setq modus-vivendi-theme-fringes 'intense)
   (setq modus-vivendi-theme-intense-hl-line t)
@@ -71,20 +70,14 @@
   :config
   (load-theme 'modus-vivendi t))
 
-;; MODELINE
-; likely want doom-modeline but moody is a minimalistic skin for modeline
-(use-package moody
   :config
-  (setq x-underline-at-descent-line t)
-  (moody-replace-mode-line-buffer-identification)
-  (moody-replace-vc-mode))
-
-;(use-package doom-modeline
-;  :hook (after-init . doom-modeline-mode)
-;  :init
-;  (setq doom-modeline-project-detection 'project)
-;  (setq doom-modeline-vcs-max-length 40)
-;  (setq doom-modeline-indent-info t))
+;; MODELINE (use-package doom-modeline
+  :hook (after-init . doom-modeline-mode)
+  :init
+  (setq doom-modeline-vcs-max-length 40)
+  (setq doom-modeline-indent-info t)
+  :config
+  (display-time-mode 1))
 
 ; No, I don't want to type out yes or no everytime
 (defalias 'yes-or-no-p 'y-or-n-p)
