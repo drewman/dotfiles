@@ -25,7 +25,6 @@
 (eval-when-compile
   (require 'use-package))
 (setq use-package-always-ensure t)
-;(setq use-package-always-defer t)
 
 (use-package exec-path-from-shell
   :config
@@ -54,7 +53,9 @@
 (set-face-attribute 'default nil :family "JetBrains Mono" :height 140)
 (use-package modus-vivendi-theme
   :init
-  (setq modus-vivendi-theme-bold-constructs t) (setq modus-vivendi-theme-slanted-constructs t)
+  (setq modus-vivendi-theme-bold-constructs t)
+  (setq modus-vivendi-theme-slanted-constructs t)
+;  (setq modus-vivendi-theme-mode-line 'moody)
   (setq modus-vivendi-theme-completions 'opinionated)
   (setq modus-vivendi-theme-fringes 'intense)
   (setq modus-vivendi-theme-intense-hl-line t)
@@ -70,8 +71,12 @@
   :config
   (load-theme 'modus-vivendi t))
 
+;; turn my lisp into fruit loops
+(use-package rainbow-delimiters
   :config
-;; MODELINE (use-package doom-modeline
+  (rainbow-delimiters-mode))
+;; MODELINE
+(use-package doom-modeline
   :hook (after-init . doom-modeline-mode)
   :init
   (setq doom-modeline-vcs-max-length 40)
@@ -79,8 +84,9 @@
   :config
   (display-time-mode 1))
 
-; No, I don't want to type out yes or no everytime
+; 'y' or 'n' is fine
 (defalias 'yes-or-no-p 'y-or-n-p)
+
 ;; STARTPAGE
 ;; add better welcome screen
 ;; dashboard prereqs
@@ -117,9 +123,8 @@
 
 ; spelling-check
 
-;; spell-fu is lightning fast
+;; lightning fast spell checker
 (use-package spell-fu
-  :diminish
   :init
   (setq spell-fu-faces-exclude '(org-meta-line org-link org-code))
   :config
@@ -127,7 +132,6 @@
 
 ;; this doesn't work right with magit :((
 ;(use-package golden-ratio
-;  :diminish
 ;  :init
 ;  (setq golden-ratio-exclude-modes 'magit-mode)
 ;  :config
@@ -149,7 +153,6 @@
 (use-package counsel)
 
 (use-package ivy
-  :diminish
   :init
   (setq ivy-use-virtual-buffers t
         ivy-count-format " (%d/%d) ")
@@ -182,7 +185,6 @@
   (all-the-icons-ivy-rich-mode 1))
 
 (use-package which-key
-  :diminish
   :init
   (setq which-key-frame-max-height 20
         which-key-sort-order 'which-key-description-order)
@@ -190,7 +192,6 @@
   (which-key-mode))
 
 (use-package company
-  :diminish
   :config
   (global-company-mode))
 
@@ -199,7 +200,6 @@
 (use-package magit)
 
 (use-package projectile
-  :diminish
   :init
   (setq projectile-completion-system 'ivy)
   :config
@@ -229,7 +229,9 @@
   :requires evil
   :init
   (setq evil-escape-excluded-states '(normal multiedit emacs motion))
-  (setq evil-escape-key-sequence "jk"))
+  (setq evil-escape-key-sequence "jk")
+  :config
+  (evil-escape-mode))
 
 (use-package evil-magit
   :requires (magit evil))
@@ -242,7 +244,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(evil-magit evil-escape evil projectile magit company which-key all-the-icons-ivy-rich ivy-rich swiper spell-fu dashboard all-the-icons page-break-lines moody modus-vivendi-theme exec-path-from-shell use-package)))
+   '(rainbow-delimiters evil-magit evil-escape evil projectile magit company which-key all-the-icons-ivy-rich ivy-rich swiper spell-fu dashboard all-the-icons page-break-lines moody modus-vivendi-theme exec-path-from-shell use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
