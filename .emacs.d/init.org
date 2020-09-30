@@ -1,7 +1,8 @@
-;;; init.el --- Drew's emacs config
-;;; Commentary:
-;;; Code:
+#+AUTHOR: Drew Bruce
+#+EMAIL: drew@drewbruce.com
 
+* Config
+#+BEGIN_SRC elisp
 ;; optimizations to speed up start-up time (per John Wiegley)
 (defvar file-name-handler-alist-old file-name-handler-alist)
 (setq package-enable-at-startup nil
@@ -142,6 +143,10 @@
   :init
   (setq uniquify-buffer-name-style 'forward))
 
+(use-package dired
+  :bind (:map dired-mode-map
+         ("c" . find-file)))
+
 ;; Completion
 ;; Would be interesting to try the minimalist approach of using icomplete
 ;; https://protesilaos.com/dotemacs/#h:b6b13f4f-91f5-416d-9934-b51b4d87770c
@@ -226,7 +231,7 @@
   (save-buffer)
   (kill-current-buffer)
 )
- 
+
 (use-package evil
   :config
   (require 'keybinds)
@@ -261,3 +266,5 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+#+END_SRC
