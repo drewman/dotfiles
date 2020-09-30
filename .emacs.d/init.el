@@ -37,6 +37,9 @@
   (exec-path-from-shell-copy-env "WORKON_HOME")
   (exec-path-from-shell-initialize))
 
+(defvar my/lisp (expand-file-name "lisp" user-emacs-directory))
+(add-to-list 'load-path my/lisp)
+
 ;; Add some window niceties
 (global-display-line-numbers-mode)
 
@@ -150,6 +153,8 @@
   :init
   (setq swiper-goto-start-of-match t))
 
+(use-package counsel)
+
 (use-package ivy
   :diminish
   :init
@@ -221,7 +226,7 @@
  
 (use-package evil
   :config
-  (require 'global-keybinds)
+  (require 'keybinds)
   (evil-ex-define-cmd "q" 'kill-current-buffer)
   (evil-ex-define-cmd "wq" 'my/save-and-kill-buffer)
   (evil-ex-define-cmd "quit" 'evil-save-and-quit)
@@ -238,3 +243,16 @@
 
 (provide 'init.el)
 ;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(evil-magit evil-escape evil projectile magit company which-key all-the-icons-ivy-rich ivy-rich swiper spell-fu dashboard all-the-icons page-break-lines moody modus-vivendi-theme exec-path-from-shell use-package)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
