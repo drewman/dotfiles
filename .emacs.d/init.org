@@ -1,9 +1,10 @@
 #+AUTHOR: Drew Bruce
 #+EMAIL: drew@drewbruce.com
 
-* Config
+* Emacs Configuration
+** Startup Optimizations
+Optimizations to speed up start-up time (per John Wiegley)
 #+BEGIN_SRC elisp
-;; optimizations to speed up start-up time (per John Wiegley)
 (defvar file-name-handler-alist-old file-name-handler-alist)
 (setq package-enable-at-startup nil
       file-name-handler-alist nil
@@ -11,14 +12,24 @@
       gc-cons-threshold 402653184
       gc-cons-percentage 0.6
       auto-window-vscroll nil)
-
-
+#+END_SRC
+** Package Management
+*** Package Sources
++ Add the "melpa" source because all the good stuff is on MELPA.
++ Add the "org" source to get (more) recent org-mode builds than what is included with emacs.
+#+BEGIN_SRC elisp
 ;; Setup use-package
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 (package-initialize)
+#+END_SRC
 
+Use-package is a must have to managing and configuring all the packages I install.
++ If use-package isn't installed, install it.
++ Load use-package.
++ Set use-package to install any packages that are configured but not installed.
+#+BEGIN_SRC elisp
 (when (not (package-installed-p 'use-package))
   (package-refresh-contents)
   (package-install 'use-package))
@@ -26,7 +37,9 @@
 (eval-when-compile
   (require 'use-package))
 (setq use-package-always-ensure t)
-
+#+END_SRC
+** ETC
+#+BEGIN_SRC elisp
 (use-package exec-path-from-shell
   :config
   (exec-path-from-shell-copy-env "WORKON_HOME")
@@ -45,8 +58,6 @@
 (tool-bar-mode -1)
 (tooltip-mode -1)
 (menu-bar-mode -1)
-(set-fringe-mode 10)
-(show-paren-mode 1)
 
 ;; turn off bell
 (setq ring-bell-function 'ignore)
@@ -72,6 +83,7 @@
   :config
   (load-theme 'modus-vivendi t))
 
+(show-paren-mode 1)
 ;; turn my lisp into fruit loops
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -246,21 +258,5 @@
 
 (use-package evil-magit
   :requires (magit evil))
-
-(provide 'init.el)
-;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(rainbow-delimiters evil-magit evil-escape evil projectile magit company which-key all-the-icons-ivy-rich ivy-rich swiper spell-fu dashboard all-the-icons page-break-lines moody modus-vivendi-theme exec-path-from-shell use-package)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
 
 #+END_SRC
