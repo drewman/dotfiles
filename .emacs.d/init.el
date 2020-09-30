@@ -88,9 +88,7 @@
 ;  (setq doom-modeline-vcs-max-length 40)
 ;  (setq doom-modeline-indent-info t))
 
-;; allows turning off of minor modes in modeline
-(use-package diminish)
-
+; No, I don't want to type out yes or no everytime
 (defalias 'yes-or-no-p 'y-or-n-p)
 ;; STARTPAGE
 ;; add better welcome screen
@@ -157,6 +155,19 @@
   :init
   (setq ivy-use-virtual-buffers t
         ivy-count-format " (%d/%d) ")
+  :bind (:map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-l" . ivy-alt-done)
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-j" . ivy-next-line)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-k" . ivy-previous-line)
+         ("C-j" . ivy-next-line)
+         ("C-d" . ivy-reverse-i-search-kill))
   :config
   (ivy-mode 1))
 
