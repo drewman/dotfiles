@@ -61,6 +61,7 @@
 (which-key-add-key-based-replacements "<SPC> o" "org")
 (define-key my/leader-map "oa" 'org-agenda)
 (define-key my/leader-map "oc" 'org-confluence-export-as-confluence)
+(define-key my/leader-map "od" 'org-babel-demarcate-block)
 (which-key-add-key-based-replacements "<SPC> oi" "open inbox")
 (define-key my/leader-map "oi" '(lambda () (interactive) (find-file "~/org/inbox.org")))
 (define-key my/leader-map "ol" 'org-store-link)

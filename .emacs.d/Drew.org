@@ -1,0 +1,320 @@
+#+AUTHOR: Drew Bruce
+#+EMAIL: drew@drewbruce.com
+#+PROPERTY: header-args :tangle yes
+
+* Emacs Configuration
+** Startup Optimizations
+Some optimizations to speed up start-up time (per John Wiegley).
+#+BEGIN_SRC emacs-lisp
+(defvar file-name-handler-alist-old file-name-handler-alist)
+(setq package-enable-at-startup nil
+      file-name-handler-alist nil
+      message-log-max 16384
+      gc-cons-threshold 402653184
+      gc-cons-percentage 0.6
+      auto-window-vscroll nil)
+#+END_SRC
+** Package Management
+*** Package Sources
++ Add the "melpa" source because all the good stuff is on MELPA.
++ Add the "org" source to get (more) recent org-mode builds than what is included with emacs.
+#+BEGIN_SRC emacs-lisp
+;; Setup use-package
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+(package-initialize)
+#+END_SRC
+*** Macros
+Use-package macros are very helpful for managing and configuring all the packages I install.
++ If use-package isn't installed, install it.
++ Load use-package.
++ Set use-package to install any packages that are configured but not installed.
+#+BEGIN_SRC emacs-lisp
+(when (not (package-installed-p 'use-package))
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(eval-when-compile
+  (require 'use-package))
+(setq use-package-always-ensure t)
+#+END_SRC
+** env
+When running code from within Emacs, ideally it will run exactly the same as if it were run in terminal.
+For that purpose, ~exec-path-from-shell~ is used so all programs will be run similarly.
+#+BEGIN_SRC emacs-lisp
+(use-package exec-path-from-shell
+    :config
+    (exec-path-from-shell-copy-env "WORKON_HOME")
+    (exec-path-from-shell-initialize))
+#+END_SRC
+** Look and Feel
+*** Line Numbers
+I like to always display line numbers.
+#+BEGIN_SRC emacs-lisp
+(global-display-line-numbers-mode)
+#+END_SRC
+*** UI Elements
+Remove unnecessary UI elements: scroll-bar, tool-bar, menu-bar, tool-tips.
+#+BEGIN_SRC emacs-lisp
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(tooltip-mode -1)
+(menu-bar-mode -1)
+#+END_SRC
+*** Ring bell
+I dislike both an audio and a visual ring-bell. So remove the ring-bell altogether.
+#+BEGIN_SRC emacs-lisp
+(setq ring-bell-function 'ignore)
+#+END_SRC
+*** Font
+Set the default display to use "JetBrains Mono" font with size 14.
+#+BEGIN_SRC emacs-lisp
+(set-face-attribute 'default nil :family "JetBrains Mono" :height 140)
+#+END_SRC
+*** Theme
+Using the modus-vivendi theme due to it's excellent customization.
+#+BEGIN_SRC emacs-lisp
+(use-package modus-vivendi-theme
+    :custom
+    (modus-vivendi-theme-bold-constructs t)
+    (modus-vivendi-theme-slanted-constructs t)
+    (modus-vivendi-theme-completions 'opinionated)
+    (modus-vivendi-theme-fringes 'intense)
+    (modus-vivendi-theme-intense-hl-line t)
+    (modus-vivendi-theme-intense-paren-match t)
+    (modus-vivendi-theme-org-blocks 'rainbow)
+    (modus-vivendi-theme-scale-headings t)
+    (modus-vivendi-theme-variable-pitch-headings t)
+    (modus-vivendi-theme-scale-1 1.15)
+    (modus-vivendi-theme-scale-2 1.3)
+    (modus-vivendi-theme-scale-3 1.45)
+    (modus-vivendi-theme-scale-4 1.6)
+    (modus-vivendi-theme-scale-5 1.75)
+    :config
+    (load-theme 'modus-vivendi t))
+#+END_SRC
+*** Parenthesis and other delimiters
+I like the matching parenthesis to match to help me understand the context of where I'm at.
+#+BEGIN_SRC emacs-lisp
+(show-paren-mode 1)
+#+END_SRC
+This might be a bit redundant with ~show-paren-mode~, but this helps me with contexts.
+#+BEGIN_SRC emacs-lisp
+;; turn my lisp into fruit loops
+(use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+END_SRC
+*** Modeline
+The default modeline is, in my opinion, dated and ugly. ~doom-modeline~
+is the best modeline that I have tried thus far. I increase the ~vcs-max-length~
+due to extra long branch names that I often use.
+#+BEGIN_SRC emacs-lisp
+  ;; MODELINE
+(use-package doom-modeline
+    :hook (after-init . doom-modeline-mode)
+    :custom
+    (doom-modeline-vcs-max-length 40)
+    (doom-modeline-indent-info t)
+    :config
+    (display-time-mode 1))
+#+END_SRC
+*** Yes or no prompt
+I really don't like having to fully type out 'yes' and 'no' everytime.
+#+BEGIN_SRC emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
+*** Icons
+A lot of the addons that I'm using have support for ~all-the-icons~ to use fancy
+icons in my completion buffer, startpage, etc.
+#+BEGIN_SRC emacs-lisp
+(use-package all-the-icons)
+#+END_SRC
+*** Startpage
+Ideally I would have a custom start page. For now ~dashboard~ suits my purposes
+and doesn't seem overly resource heavy.
+#+BEGIN_SRC emacs-lisp
+(use-package page-break-lines)
+(use-package dashboard
+    :requires (page-break-lines all-the-icons)
+    :custom
+    (dashboard-startup-banner 'logo)
+    :config
+    ;; force dashboard to add hooks when command line args are present (making compatible with chemacs)
+    (add-hook 'after-init-hook (lambda () (dashboard-insert-startupify-lists)))
+    (add-hook 'emacs-startup-hook '(lambda ()
+                                     (switch-to-buffer "*dashboard*")
+                                     (goto-char (point-min))
+                                     (redisplay))))
+  ;; WOULD BE BETTER TO JUST OPEN A CUSTOM ORG FILE
+  ; (setq inhibit-startup-screen t)
+  ; (setq initial-buffer-choice "~/.custom-emacs.d/init.el")
+#+END_SRC
+*** Indention
+I pulled this off of emacs-for-vimmers. I prefer 4 spaces to tabs.
+#+BEGIN_SRC emacs-lisp
+(setq default-tab-width 4)
+(setq tab-width 4)
+(setq default-fill-column 120)
+(setq fill-column 120)
+(setq-default evil-indent-convert-tabs nil)
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+(setq-default evil-shift-round nil)
+#+END_SRC
+*** Window Splitting
+Golden ratio allows for nicely utilizing your active buffer while still being able to see what's going on in the other frames.
+Currently commented out until I have time to tweak it into submission.
+#+BEGIN_SRC emacs-lisp
+  ;; this doesn't work right with magit :((
+  ;(use-package golden-ratio
+  ;  :init
+  ;  (setq golden-ratio-exclude-modes 'magit-mode)
+  ;  :config
+  ;  (golden-ratio-mode 1))
+#+END_SRC
+*** Buffer Switching
+I dislike the default for prepending numbers to buffers with the same name.
+This changes them to use the path to delinate them.
+#+BEGIN_SRC emacs-lisp
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward)
+#+END_SRC emacs-lisp
+** Completion
+*** Framework
+Currently using Ivy. I've found that it works the best with the least amount of configuration to the other frameworks I've tried.
+Prost uses icomplete, which would be interesting to try, however it requires a lot of configuration to get correct.
+#+BEGIN_SRC emacs-lisp
+(use-package swiper
+    :custom
+    (swiper-goto-start-of-match t))
+
+(use-package counsel)
+
+(use-package ivy
+    :custom
+    (ivy-use-virtual-buffers t)
+    (ivy-count-format " (%d/%d) ")
+    :bind (:map ivy-minibuffer-map
+           ("TAB" . ivy-alt-done)
+           ("C-l" . ivy-alt-done)
+           ("C-j" . ivy-next-line)
+           ("C-k" . ivy-previous-line)
+           ("C-o" . ivy-dispatching-done)
+           :map ivy-switch-buffer-map
+           ("C-k" . ivy-previous-line)
+           ("C-j" . ivy-next-line)
+           ("C-d" . ivy-switch-buffer-kill)
+           :map ivy-reverse-i-search-map
+           ("C-k" . ivy-previous-line)
+           ("C-j" . ivy-next-line)
+           ("C-d" . ivy-reverse-i-search-kill))
+    :config
+    (ivy-mode 1))
+
+(use-package ivy-rich
+    :requires ivy
+    :init
+    (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+    :config
+    (ivy-rich-mode 1))
+
+(use-package all-the-icons-ivy-rich
+    :requires (ivy-rich all-the-icons)
+    :config
+    (all-the-icons-ivy-rich-mode 1))
+#+END_SRC
+*** Which-key
+I love having the suggestions, so if I ever forget my binds I can just look.
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+    :custom
+    (which-key-frame-max-height 20)
+    (which-key-sort-order 'which-key-description-order)
+    :config
+    (which-key-mode))
+#+END_SRC
+*** Spelling
+Flyspell just works and works well.
+#+BEGIN_SRC emacs-lisp
+(use-package flyspell
+  :hook (org-mode . flyspell-mode))
+
+(use-package flyspell-correct
+  :after flyspell
+  :bind (:map flyspell-mode-map ("C-;" . flyspell-correct-wrapper)))
+
+(use-package flyspell-correct-ivy
+  :after flyspell-correct)
+#+END_SRC
+** Help menus
+Improved help menus with ~helpful~.
+#+BEGIN_SRC emacs-lisp
+(use-package helpful
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable))
+#+END_SRC
+** Scratch
+Prefer a scratch message that reminds me of the keybinds I always forget.
+#+BEGIN_SRC emacs-lisp
+(setq initial-scratch-message ";;C-j evaluate\n;;C-x C-f to save buffer\n\n")
+#+END_SRC
+** Development
+*** Completion
+Company is the default. Everything supports it and it works well.
+#+BEGIN_SRC emacs-lisp
+  ;; SECTION -- DEV
+(use-package company
+    :config
+    (global-company-mode))
+#+END_SRC
+*** Source Control
+Magit is the default for git. One of the main reasons to use Emacs.
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+    :custom
+    (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+    (magit-save-repository-buffers t)
+    :config
+    (add-hook 'with-editor-mode-hook 'evil-insert-state))
+#+END_SRC
+*** Projects
+Projectile is great for doing project related activities.
+#+BEGIN_SRC emacs-lisp
+(use-package projectile
+    :custom
+    (projectile-completion-system 'ivy)
+    :config
+    (projectile-mode +1))
+#+END_SRC
+** Keybinds
+#+BEGIN_SRC emacs-lisp
+(defun my/save-and-kill-buffer ()
+    "Helper function to map to :wq."
+    (interactive)
+    (save-buffer)
+    (kill-current-buffer)
+)
+
+(use-package evil
+    :load-path "~/.emacs.d/lisp"
+    :config
+    (require 'keybinds)
+    (evil-ex-define-cmd "q" 'kill-current-buffer)
+    (evil-ex-define-cmd "wq" 'my/save-and-kill-buffer)
+    (evil-ex-define-cmd "quit" 'evil-save-and-quit)
+    (evil-mode 1))
+
+(use-package evil-escape
+    :requires evil
+    :custom
+    (evil-escape-excluded-states '(normal multiedit emacs motion))
+    (evil-escape-key-sequence "jk")
+    :config
+    (evil-escape-mode))
+
+(use-package evil-magit
+    :requires (magit evil))
+
+#+END_SRC
