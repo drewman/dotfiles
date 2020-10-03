@@ -166,12 +166,12 @@ I pulled this off of emacs-for-vimmers. I prefer 4 spaces to tabs.
 Golden ratio allows for nicely utilizing your active buffer while still being able to see what's going on in the other frames.
 Currently commented out until I have time to tweak it into submission.
 #+BEGIN_SRC emacs-lisp
-  ;; this doesn't work right with magit :((
-  ;(use-package golden-ratio
-  ;  :init
-  ;  (setq golden-ratio-exclude-modes 'magit-mode)
-  ;  :config
-  ;  (golden-ratio-mode 1))
+  (use-package golden-ratio
+    :disabled
+    :init
+    (setq golden-ratio-exclude-modes 'magit-mode)
+    :config
+    (golden-ratio-mode 1))
 #+END_SRC
 *** Buffer Switching
 I dislike the default for prepending numbers to buffers with the same name.
@@ -269,6 +269,12 @@ Company is the default. Everything supports it and it works well.
     :config
     (global-company-mode))
 #+END_SRC
+*** Checkers
+Flycheck to show syntax issues
+#+BEGIN_SRC emacs-lisp
+(use-package flycheck
+    :init (global-flycheck-mode))
+#+END_SRC
 *** Source Control
 Magit is the default for git. One of the main reasons to use Emacs.
 #+BEGIN_SRC emacs-lisp
@@ -288,33 +294,56 @@ Projectile is great for doing project related activities.
     :config
     (projectile-mode +1))
 #+END_SRC
+*** prog-mode
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook 'eldoc-mode)
+  (add-hook 'prog-mode-hook 'which-function-mode)
+#+END_SRC
+*** Python
+#+BEGIN_SRC emacs-lisp
+  (use-package anaconda-mode
+    :config
+    (add-hook 'python-mode-hook 'anaconda-mode))
+
+  (use-package company-anaconda
+    :after (company anaconda-mode)
+    :config
+    (add-to-list 'company-backends 'company-anaconda))
+#+END_SRC
+*** Haskell
+#+BEGIN_SRC emacs-lisp
+  (use-package haskell-mode
+    :config
+    (haskell-indentation-mode +1)
+    (interactive-haskell-mode +1))
+#+END_SRC
 ** Keybinds
 #+BEGIN_SRC emacs-lisp
-(defun my/save-and-kill-buffer ()
-    "Helper function to map to :wq."
-    (interactive)
-    (save-buffer)
-    (kill-current-buffer)
-)
+  (defun my/save-and-kill-buffer ()
+      "Helper function to map to :wq."
+      (interactive)
+      (save-buffer)
+      (kill-buffer-and-window)
+  )
 
-(use-package evil
-    :load-path "~/.emacs.d/lisp"
-    :config
-    (require 'keybinds)
-    (evil-ex-define-cmd "q" 'kill-current-buffer)
-    (evil-ex-define-cmd "wq" 'my/save-and-kill-buffer)
-    (evil-ex-define-cmd "quit" 'evil-save-and-quit)
-    (evil-mode 1))
+  (use-package evil
+      :load-path "~/.emacs.d/lisp"
+      :config
+      (require 'keybinds)
+      (evil-ex-define-cmd "q" 'kill-buffer-and-window)
+      (evil-ex-define-cmd "wq" 'my/save-and-kill-buffer)
+      (evil-ex-define-cmd "quit" 'evil-save-and-quit)
+      (evil-mode 1))
 
-(use-package evil-escape
-    :requires evil
-    :custom
-    (evil-escape-excluded-states '(normal multiedit emacs motion))
-    (evil-escape-key-sequence "jk")
-    :config
-    (evil-escape-mode))
+  (use-package evil-escape
+      :requires evil
+      :custom
+      (evil-escape-excluded-states '(normal multiedit emacs motion))
+      (evil-escape-key-sequence "jk")
+      :config
+      (evil-escape-mode))
 
-(use-package evil-magit
-    :requires (magit evil))
+  (use-package evil-magit
+      :requires (magit evil))
 
 #+END_SRC
