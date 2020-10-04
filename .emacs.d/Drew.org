@@ -1,9 +1,11 @@
 #+TITLE: Drew's Emacs Configuration
 #+AUTHOR: Drew Bruce
 #+EMAIL: drew@drewbruce.com
-#+PROPERTY: header-args :tangle yes
 
 * Emacs Configuration
+:PROPERTIES:
+:header-args: :tangle yes :comments org :results output silent
+:END:
 ** Startup Optimizations
 Some optimizations to speed up start-up time (per John Wiegley).
 #+BEGIN_SRC emacs-lisp
@@ -15,6 +17,7 @@ Some optimizations to speed up start-up time (per John Wiegley).
       gc-cons-percentage 0.6
       auto-window-vscroll nil)
 #+END_SRC
+
 ** Package Management
 *** Package Sources
 + Add the "melpa" source because all the good stuff is on MELPA.
@@ -52,7 +55,7 @@ I prefer to have :q commands just close the window and not Emacs. Only ~:quit~ s
       (my/evil-close))
 
   (defun my/evil-close()
-    "Helper function to kill buffer and close window if there's more than one"
+    "Helper function to kill buffer or close window if there's more than one"
     (interactive)
     (if (> (count-windows) 1)
         (evil-window-delete)
@@ -114,17 +117,17 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
     "d" '(:ignore t :which-key "describe")
     "da" 'counsel-describe-face
     "db" 'describe-bindings
-    "dc" 'helpful-command
-    "df" 'counsel-describe-function
+    "dc" '(helpful-command :which-key "describe commands")
+    "df" '(helpful-function :which-key "describe function")
     "dh" 'info-emacs-manual
-    "dk" 'helpful-key
-    "dl" 'counsel-find-library
+    "dk" '(helpful-key :which-key "describe key")
+    "dl" '(counsel-find-library :which-key "find library")
     "dm" 'describe-mode
-    "dp" 'helpful-at-point
-    "ds" 'counsel-describe-symbol
-    "dv" 'counsel-describe-variable
-    "dM" 'helpful-macro
-    "dV" 'counsel-set-variable
+    "do" '(helpful-macro :which-key "describe macro")
+    "dp" '(helpful-at-point :which-key "describe at point")
+    "ds" '(counsel-describe-symbol :which-key "describe symbol")
+    "dv" '(counsel-describe-variable :which-key "describe variable")
+    "dV" '(counsel-set-variable :which-key "set variable")
 
     "g" '(:ignore t :which-key "magit")
     "gb" 'magit-branch-and-checkout
@@ -202,6 +205,7 @@ Set the default display to use "JetBrains Mono" font with size 14.
 Using the modus-vivendi theme due to it's excellent customization.
 #+BEGIN_SRC emacs-lisp
 (use-package modus-vivendi-theme
+    :demand t
     :custom
     (modus-vivendi-theme-bold-constructs t)
     (modus-vivendi-theme-slanted-constructs t)
@@ -224,6 +228,7 @@ This might be a bit redundant with ~show-paren-mode~, but this helps me with con
 #+BEGIN_SRC emacs-lisp
 ;; turn my lisp into fruit loops
 (use-package rainbow-delimiters
+    :defer
     :hook (prog-mode . rainbow-delimiters-mode))
 #+END_SRC
 *** Modeline
@@ -233,6 +238,7 @@ due to extra long branch names that I often use.
 #+BEGIN_SRC emacs-lisp
   ;; MODELINE
 (use-package doom-modeline
+    :demand t
     :hook (after-init . doom-modeline-mode)
     :custom
     (doom-modeline-vcs-max-length 40)
@@ -372,11 +378,16 @@ Flyspell just works and works well.
 ** Help menus
 Improved help menus with ~helpful~.
 #+BEGIN_SRC emacs-lisp
-(use-package helpful
-    :custom
-    (counsel-describe-function-function #'helpful-callable)
-    (counsel-describe-variable-function #'helpful-variable))
+  (use-package helpful
+      :defer t
+      :custom
+      (counsel-describe-function-function #'helpful-callable)
+      (counsel-describe-variable-function #'helpful-variable))
+  (general-def helpful-mode-map
+       :states '(normal motion emacs)
+       "q" 'kill-buffer-and-window)
 #+END_SRC
+
 ** Scratch
 Prefer a scratch message that reminds me of the keybinds I always forget.
 #+BEGIN_SRC emacs-lisp
@@ -388,6 +399,7 @@ Company is the default. Everything supports it and it works well.
 #+BEGIN_SRC emacs-lisp
   ;; SECTION -- DEV
 (use-package company
+    :defer t
     :config
     (global-company-mode))
 #+END_SRC
@@ -395,12 +407,14 @@ Company is the default. Everything supports it and it works well.
 Flycheck to show syntax issues
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
+    :defer t
     :init (global-flycheck-mode))
 #+END_SRC
 *** Source Control
 Magit is the default for git. One of the main reasons to use Emacs.
 #+BEGIN_SRC emacs-lisp
 (use-package magit
+    :defer t
     :custom
     (magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
     (magit-save-repository-buffers t)
@@ -410,12 +424,14 @@ Magit is the default for git. One of the main reasons to use Emacs.
 Add evil keybinds for magit.
 #+BEGIN_SRC emacs-lisp
   (use-package evil-magit
-      :requires (magit evil))
+      :defer t
+      :after (magit evil))
 #+END_SRC
 *** Projects
 Projectile is great for doing project related activities.
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
+    :defer t
     :custom
     (projectile-completion-system 'ivy)
     :config
@@ -429,10 +445,12 @@ Projectile is great for doing project related activities.
 *** Python
 #+BEGIN_SRC emacs-lisp
   (use-package anaconda-mode
+    :defer t
     :config
     (add-hook 'python-mode-hook 'anaconda-mode))
 
   (use-package company-anaconda
+    :defer t
     :after (company anaconda-mode)
     :config
     (add-to-list 'company-backends 'company-anaconda))
@@ -440,12 +458,14 @@ Projectile is great for doing project related activities.
 *** Haskell
 #+BEGIN_SRC emacs-lisp
   (use-package haskell-mode
-    :defer
+    :defer t
     :config
     (haskell-indentation-mode +1)
     (interactive-haskell-mode +1))
 
   (use-package flycheck-haskell
+      :defer t
+      :after (haskell-mode flycheck)
       :init (add-hook 'haskell-mode-hook #'flycheck-haskell-setup))
 #+END_SRC
 *** Elisp
@@ -456,15 +476,81 @@ Projectile is great for doing project related activities.
      "e" 'eval-expression)
 #+END_SRC
 ** Org
+*** Setup
+#+BEGIN_SRC emacs-lisp
+  (defun my/remove-properties (str)
+    (string-join (seq-filter (lambda (st) (not (string-prefix-p ":" st))) (split-string str "\n")) "\n"))
+
+  (defvar my/refile-targets
+    (mapcar 'abbreviate-file-name
+            (split-string
+             (shell-command-to-string "find -L ~/org -name '*.org'") "\n")))
+
+  (defvar my/capture-templates
+      '(
+          ("b" "bullet" entry (function org-roam--capture-get-point)
+          "* %?\n"
+          :file-name "inbox.org"
+          :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
+          :unnarrowed t)
+          ("t" "todo" entry (function org-roam--capture-get-point)
+          "* TODO %?\n"
+          :file-name "inbox.org"
+          :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
+          :unnarrowed t)
+          ("s" "slip" plain (function org-roam--capture-get-point)
+          "%?"
+          :file-name "${slug}"
+          :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
+          :unnarrowed t)))
+
+  (defvar my/dailies-capture-templates
+      '(
+          ("d" "daily" plain (function org-roam--capture-get-point)
+          ""
+          :immediate-finish t
+          :file-name "%<%Y-%m-%d>"
+          :head "#+title: %<%Y-%m-%d>\n#+roam_tags\n\n")))
+
+  (use-package org
+      :custom
+      (org-directory "~/org/")
+      (org-babel-process-comment-text 'my/remove-properties)
+      (org-agenda-files (cons "~/.emacs.d/Drew.org" (directory-files-recursively "~/org/notes" "\\.org$")))
+      (org-refile-targets '((my/refile-targets :maxlevel . 1)))
+      (org-link-file-path-type "absolute"))
+
+  (use-package org-contrib-plus
+    :after org
+    :config
+    (require 'ox-confluence))
+
+  (use-package org-roam
+    :after org
+    :custom
+    (org-roam-directory "~/org/notes")
+    (org-roam-capture-templates my/capture-templates)
+    (org-roam-dailies-capture-templates my/dailies-capture-templates)
+    :config
+    (add-hook 'after-init-hook 'org-roam-mode))
+#+END_SRC
+
 *** Keymaps
 #+BEGIN_SRC emacs-lisp
-    (my/local-leader org-mode-map
-        "c" 'org-confluence-export-as-confluence
-        "d" 'org-babel-demarcate-block
-        "l" 'org-store-link
-        "n" 'org-narrow-to-subtree
-        "r" 'org-refile
-        "t" 'org-babel-tangle
-        "w" 'widen
-        "x" 'org-export-dispatch)
+  (my/local-leader org-mode-map
+      "c" 'org-confluence-export-as-confluence
+      "e" 'org-edit-special
+      "i" 'org-roam-insert
+      "l" 'org-store-link
+      "m" 'org-roam-dailies-tomorrow
+      "n" 'org-narrow-to-subtree
+      "r" 'org-refile
+      "t" 'org-roam-dailies-today
+      "v" 'org-babel-load-in-session
+      "w" 'widen
+      "x" 'org-export-dispatch
+      "y" 'org-roam-dailies-yesterday
+      "D" 'org-babel-demarcate-block
+      "I" 'org-roam-insert-immediate
+      "T" 'org-babel-tangle)
 #+END_SRC
