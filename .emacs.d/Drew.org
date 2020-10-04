@@ -333,7 +333,7 @@ I prefer to have :q commands just close the window and not Emacs. Only ~:quit~ s
         (save-buffer)
         (my/evil-close))
 
-    (defun my/evil-quit()
+    (defun my/evil-close()
       "Helper function to kill buffer and close window if there's more than one"
       (interactive)
       (kill-buffer)
