@@ -155,8 +155,8 @@ I pulled this off of emacs-for-vimmers. I prefer 4 spaces to tabs.
 #+BEGIN_SRC emacs-lisp
 (setq default-tab-width 4)
 (setq tab-width 4)
-(setq default-fill-column 120)
-(setq fill-column 120)
+(setq default-fill-column 80)
+(setq fill-column 80)
 (setq-default evil-indent-convert-tabs nil)
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
@@ -193,8 +193,9 @@ Prost uses icomplete, which would be interesting to try, however it requires a l
 
 (use-package ivy
     :custom
-    (ivy-use-virtual-buffers t)
     (ivy-count-format " (%d/%d) ")
+    (setq ivy-re-builders-alist
+          '((t . ivy--regex-ignore-order)))
     :bind (:map ivy-minibuffer-map
            ("TAB" . ivy-alt-done)
            ("C-l" . ivy-alt-done)
@@ -258,7 +259,7 @@ Improved help menus with ~helpful~.
 ** Scratch
 Prefer a scratch message that reminds me of the keybinds I always forget.
 #+BEGIN_SRC emacs-lisp
-(setq initial-scratch-message ";;C-j evaluate\n;;C-x C-f to save buffer\n\n")
+(setq initial-scratch-message ";;C-j evaluate\n;;C-x C-e evalutate-last-sexp;;C-x C-f to save buffer\n\n")
 #+END_SRC
 ** Development
 *** Completion
@@ -313,28 +314,44 @@ Projectile is great for doing project related activities.
 *** Haskell
 #+BEGIN_SRC emacs-lisp
   (use-package haskell-mode
+    :defer
     :config
     (haskell-indentation-mode +1)
     (interactive-haskell-mode +1))
+
+  (use-package flycheck-haskell
+      :init (add-hook 'haskell-mode-hook #'flycheck-haskell-setup))
 #+END_SRC
 ** Keybinds
+*** Evil
+**** : commands
+I prefer to have :q commands just close the window and not Emacs. Only ~:quit~ should exit Emacs.
 #+BEGIN_SRC emacs-lisp
-  (defun my/save-and-kill-buffer ()
-      "Helper function to map to :wq."
+    (defun my/evil-save-and-close()
+        "Helper function to map to :wq."
+        (interactive)
+        (save-buffer)
+        (my/evil-close))
+
+    (defun my/evil-quit()
+      "Helper function to kill buffer and close window if there's more than one"
       (interactive)
-      (save-buffer)
-      (kill-buffer-and-window)
-  )
+      (kill-buffer)
+      (if (> (count-windows) 1)
+          (evil-window-delete)))
 
-  (use-package evil
-      :load-path "~/.emacs.d/lisp"
-      :config
-      (require 'keybinds)
-      (evil-ex-define-cmd "q" 'kill-buffer-and-window)
-      (evil-ex-define-cmd "wq" 'my/save-and-kill-buffer)
-      (evil-ex-define-cmd "quit" 'evil-save-and-quit)
-      (evil-mode 1))
-
+    (use-package evil
+        :load-path "~/.emacs.d/lisp"
+        :config
+        (require 'keybinds)
+        (evil-ex-define-cmd "q" 'my/evil-close)
+        (evil-ex-define-cmd "wq" 'my/evil-save-and-close)
+        (evil-ex-define-cmd "quit" 'evil-save-and-quit)
+        (evil-mode 1))
+#+END_SRC
+**** imap <Esc>
+Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
+#+BEGIN_SRC emacs-lisp
   (use-package evil-escape
       :requires evil
       :custom
@@ -342,8 +359,10 @@ Projectile is great for doing project related activities.
       (evil-escape-key-sequence "jk")
       :config
       (evil-escape-mode))
-
+#+END_SRC
+**** Magit
+Add evil keybinds for magit.
+#+BEGIN_SRC emacs-lisp
   (use-package evil-magit
       :requires (magit evil))
-
 #+END_SRC
