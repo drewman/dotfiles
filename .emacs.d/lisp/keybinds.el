@@ -1,99 +1,107 @@
 ; SECTION -- KEYBINDS
-(defvar my/leader-map
-  (make-sparse-keymap)
-  "Keymap for 'leader' keys.")
+;; (defvar my/leader-map
+;;   (make-sparse-keymap)
+;;   "Keymap for 'leader' keys.")
+(use-package restart-emacs)
 
-(evil-define-key 'normal global-map (kbd "SPC") my/leader-map)
-(evil-define-key 'insert global-map (kbd "C-<SPC>") my/leader-map)
-(evil-define-key 'visual global-map (kbd "C-<SPC>") my/leader-map)
+(use-package general)
 
-(define-key my/leader-map "<SPC>" 'projectile-find-file)
-(define-key my/leader-map "." 'counsel-find-file)
-(define-key my/leader-map "'" 'ivy-resume)
-(which-key-add-key-based-replacements "<SPC> x" "M-x")
-(define-key my/leader-map "x" 'counsel-M-x)
+(defun my/open-config
+    (interactive)
+    (find-file "~/.emacs.d/Drew.org"))
 
-(which-key-add-key-based-replacements "<SPC> p" "projectile")
-(define-key my/leader-map "p" 'projectile-command-map)
+(general-define-key
+    :states '(normal visual insert)
+    :prefix "SPC"
+    :non-normal-prefix "C-SPC"
+    "p" '(projectile-command-map :which-key "projectile")
+    "x" '(counsel-M-x :which-key "M-x")
+    "." '(counsel-find-file :which-key "find file")
+    "'" 'ivy-resume
 
-(which-key-add-key-based-replacements "<SPC> f" "file")
-(define-key my/leader-map "ff" 'counsel-find-file)
-(define-key my/leader-map "fj" 'counsel-file-jump)
-(which-key-add-key-based-replacements "<SPC> fc" "open personal config")
-(define-key my/leader-map "fp" '(lambda () (interactive) (find-file "~/.emacs.d/init.el")))
-(define-key my/leader-map "fs" 'save-buffer)
-(define-key my/leader-map "fM" 'mkdir)
-(define-key my/leader-map "fN" 'create-empty-file)
+    "f" '(:ignore t :which-key "file")
+    "ff" 'counsel-find-file
+    "fj" 'counsel-file-jump
+    "fp" '(my/open-config :which-key "open personal config")
+    "fs" 'save-buffer
+    "fM" 'mkdir
+    "fN" 'create-empty-file
 
-(which-key-add-key-based-replacements "<SPC> b" "buffer")
-(define-key my/leader-map "bb" 'counsel-switch-buffer)
-(define-key my/leader-map "bc" 'kill-current-buffer)
-(define-key my/leader-map "bd" 'counsel-bookmarked-directory)
-(define-key my/leader-map "be" 'eval-buffer)
-(define-key my/leader-map "bk" 'kill-buffer)
-(define-key my/leader-map "bl" 'evil-switch-to-windows-last-buffer)
-(define-key my/leader-map "bm" 'counsel-bookmark)
-;;(define-key my/leader-map "r" 'ranger)
-;;(define-key my/leader-map "t" 'shell-pop)
+    "b" '(:ignore t :which-key "buffer")
+    "bb" 'counsel-switch-buffer
+    "bc" 'kill-current-buffer
+    "bd" 'counsel-bookmarked-directory
+    "be" 'eval-buffer
+    "bk" 'kill-buffer
+    "bl" '(evil-switch-to-windows-last-buffer :which-key "last buffer")
+    "bm" 'counsel-bookmark
+    "bw" 'kill-buffer-and-window
 
-(which-key-add-key-based-replacements "<SPC> h" "help")
-(define-key my/leader-map "ha" 'counsel-describe-face)
-(define-key my/leader-map "hb" 'counsel-descbinds)
-(define-key my/leader-map "hc" 'helpful-command)
-(define-key my/leader-map "hf" 'counsel-describe-function)
-(define-key my/leader-map "hh" 'info-emacs-manual)
-(define-key my/leader-map "hk" 'helpful-key)
-(define-key my/leader-map "hl" 'counsel-find-library)
-(define-key my/leader-map "hm" 'describe-mode)
-(define-key my/leader-map "hp" 'helpful-at-point)
-(define-key my/leader-map "hv" 'counsel-describe-variable)
-(define-key my/leader-map "hy" 'counsel-describe-symbol)
-(define-key my/leader-map "hM" 'helpful-macro)
-(define-key my/leader-map "hV" 'counsel-set-variable)
+    "d" '(:ignore t :which-key "describe")
+    "da" 'counsel-describe-face
+    "db" 'describe-bindings
+    "dc" 'helpful-command
+    "df" 'counsel-describe-function
+    "dh" 'info-emacs-manual
+    "dk" 'helpful-key
+    "dl" 'counsel-find-library
+    "dm" 'describe-mode
+    "dp" 'helpful-at-point
+    "ds" 'counsel-describe-symbol
+    "dv" 'counsel-describe-variable
+    "dM" 'helpful-macro
+    "dV" 'counsel-set-variable
 
-(which-key-add-key-based-replacements "<SPC> g" "magit")
-(define-key my/leader-map "gb" 'magit-branch-and-checkout)
-(define-key my/leader-map "gc" 'magit-clone)
-(define-key my/leader-map "gg" 'magit-status)
-(define-key my/leader-map "gi" 'magit-init)
-(define-key my/leader-map "gl" 'magit-log)
+    "g" '(:ignore t :which-key "magit")
+    "gb" 'magit-branch-and-checkout
+    "gc" 'magit-clone
+    "gg" 'magit-status
+    "gi" 'magit-init
+    "gl" 'magit-log
 
-(which-key-add-key-based-replacements "<SPC> o" "org")
-(define-key my/leader-map "oa" 'org-agenda)
-(define-key my/leader-map "oc" 'org-confluence-export-as-confluence)
-(define-key my/leader-map "od" 'org-babel-demarcate-block)
-(which-key-add-key-based-replacements "<SPC> oi" "open inbox")
-(define-key my/leader-map "oi" '(lambda () (interactive) (find-file "~/org/inbox.org")))
-(define-key my/leader-map "ol" 'org-store-link)
-(define-key my/leader-map "on" 'org-narrow-to-subtree)
-(define-key my/leader-map "oo" 'org-capture)
-(define-key my/leader-map "or" 'org-refile)
-(define-key my/leader-map "ow" 'widen)
-(define-key my/leader-map "ox" 'org-export-dispatch)
+    "o" '(:ignore t :which-key "org")
+    "oa" 'org-agenda
+    "oo" 'org-capture
 
-(which-key-add-key-based-replacements "<SPC> w" "window")
-(define-key my/leader-map "wb" 'balance-windows)
-(define-key my/leader-map "wd" 'delete-other-windows)
-(define-key my/leader-map "wn" 'evil-window-new)
-(define-key my/leader-map "wo" 'other-window)
-(define-key my/leader-map "wq" 'evil-quit)
-(define-key my/leader-map "ws" 'evil-window-split)
-(define-key my/leader-map "wv" 'evil-window-vsplit)
-(define-key my/leader-map "wh" 'evil-window-left)
-(define-key my/leader-map "wl" 'evil-window-right)
-(define-key my/leader-map "wj" 'evil-window-down)
-(define-key my/leader-map "wk" 'evil-window-up)
+    "w" '(:ignore t :which-key "window")
+    "wb" 'balance-windows
+    "wd" 'delete-other-windows
+    "wn" 'evil-window-new
+    "wo" 'other-window
+    "wq" 'evil-quit
+    "ws" 'evil-window-split
+    "wv" 'evil-window-vsplit
+    "wh" 'evil-window-left
+    "wl" 'evil-window-right
+    "wj" 'evil-window-down
+    "wk" 'evil-window-up
+ )
 
-(which-key-add-key-based-replacements "<SPC> y" "yas")
-(define-key my/leader-map "yn" 'yas-new-snippet)
+(general-define-key
+    :states '(normal visual insert)
+    :prefix "SPC l"
+    :non-normal-prefix "C-SPC l"
+    "" '(:ignore t :which-key "local")
 
-;;(evil-global-set-key 'motion "C-," 'er/expand-region)
-(evil-global-set-key 'normal "/" 'swiper-isearch)
-(evil-global-set-key 'visual (kbd "C-c c") 'comment-region)
-(evil-global-set-key 'visual (kbd "C-c u") 'uncomment-region)
+    :keymap 'org-mode-map
+    "c" 'org-confluence-export-as-confluence
+    "d" 'org-babel-demarcate-block
+    "l" 'org-store-link
+    "n" 'org-narrow-to-subtree
+    "r" 'org-refile
+    "t" 'org-babel-tangle
+    "w" 'widen
+    "x" 'org-export-dispatch)
 
-(evil-define-minor-mode-key 'normal 'org-present-mode (kbd "n") 'org-present-next)
-(evil-define-minor-mode-key 'normal 'org-present-mode (kbd "p") 'org-present-prev)
-(evil-define-minor-mode-key 'normal 'org-present-mode (kbd "q") 'org-present-quit)
+;; (which-key-add-key-based-replacements "<SPC> y" "yas")
+;; (define-key my/leader-map "yn" 'yas-new-snippet)
+
+;; ;;(evil-global-set-key 'motion "C-," 'er/expand-region)
+;; (evil-global-set-key 'normal "/" 'swiper-isearch)
+;; (evil-global-set-key 'visual (kbd "C-c c") 'comment-or-uncomment-region)
+
+;; (evil-define-minor-mode-key 'normal 'org-present-mode (kbd "n") 'org-present-next)
+;; (evil-define-minor-mode-key 'normal 'org-present-mode (kbd "p") 'org-present-prev)
+;; (evil-define-minor-mode-key 'normal 'org-present-mode (kbd "q") 'org-present-quit)
 
 (provide 'keybinds)
