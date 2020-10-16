@@ -29,6 +29,7 @@ Some optimizations to speed up start-up time (per John Wiegley).
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 (package-initialize)
 #+END_SRC
+
 *** Macros
 Use-package macros are very helpful for managing and configuring all the packages I install.
 + If use-package isn't installed, install it.
@@ -43,6 +44,7 @@ Use-package macros are very helpful for managing and configuring all the package
   (require 'use-package))
 (setq use-package-always-ensure t)
 #+END_SRC
+
 ** Keybinds
 *** Evil
 **** colon commands
@@ -79,6 +81,7 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
       :config
       (evil-escape-mode))
 #+END_SRC
+
 **** Global binds
 #+BEGIN_SRC emacs-lisp
 (use-package general)
@@ -88,7 +91,7 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
     (find-file "~/.emacs.d/Drew.org"))
 
 (general-define-key
-    :states '(normal visual insert emacs motion)
+    :states '(normal visual insert emacs)
     :prefix "SPC"
     :non-normal-prefix "C-SPC"
     "p" '(projectile-command-map :which-key "projectile")
@@ -155,7 +158,7 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
  )
 
 (general-create-definer my/local-leader-def
-  :states '(normal insert visual emacs)
+  :states '(normal visual insert emacs)
   :prefix "SPC l"
   :non-normal-prefix "C-SPC l"
   "" '(:ignore t :which-key "local"))
@@ -168,6 +171,7 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
      :states '(normal motion)
      "/" 'swiper-isearch)
 #+END_SRC
+
 ** env
 When running code from within Emacs, ideally it will run exactly the same as if it were run in terminal.
 For that purpose, ~exec-path-from-shell~ is used so all programs will be run similarly.
@@ -177,12 +181,14 @@ For that purpose, ~exec-path-from-shell~ is used so all programs will be run sim
     (exec-path-from-shell-copy-env "WORKON_HOME")
     (exec-path-from-shell-initialize))
 #+END_SRC
+
 ** Look and Feel
 *** Line Numbers
 I like to always display line numbers.
 #+BEGIN_SRC emacs-lisp
 (global-display-line-numbers-mode)
 #+END_SRC
+
 *** UI Elements
 Remove unnecessary UI elements: scroll-bar, tool-bar, menu-bar, tool-tips.
 #+BEGIN_SRC emacs-lisp
@@ -191,34 +197,38 @@ Remove unnecessary UI elements: scroll-bar, tool-bar, menu-bar, tool-tips.
 (tooltip-mode -1)
 (menu-bar-mode -1)
 #+END_SRC
+
 *** Ring bell
 I dislike both an audio and a visual ring-bell. So remove the ring-bell altogether.
 #+BEGIN_SRC emacs-lisp
 (setq ring-bell-function 'ignore)
 #+END_SRC
+
 *** Font
 Set the default display to use "JetBrains Mono" font with size 14.
 #+BEGIN_SRC emacs-lisp
 (set-face-attribute 'default nil :family "JetBrains Mono" :height 140)
 #+END_SRC
+
 *** Theme
 Using the modus-vivendi theme due to it's excellent customization.
 #+BEGIN_SRC emacs-lisp
-(use-package modus-vivendi-theme
-    :demand t
-    :custom
-    (modus-vivendi-theme-bold-constructs t)
-    (modus-vivendi-theme-slanted-constructs t)
-    (modus-vivendi-theme-completions 'opinionated)
-    (modus-vivendi-theme-fringes 'intense)
-    (modus-vivendi-theme-intense-hl-line t)
-    (modus-vivendi-theme-intense-paren-match t)
-    (modus-vivendi-theme-org-blocks 'rainbow)
-    (modus-vivendi-theme-scale-headings t)
-    (modus-vivendi-theme-variable-pitch-headings t)
-    :config
-    (load-theme 'modus-vivendi t))
+  (use-package modus-vivendi-theme
+      :demand t
+      :custom
+      (modus-vivendi-theme-bold-constructs t)
+      (modus-vivendi-theme-slanted-constructs t)
+      (modus-vivendi-theme-completions 'opinionated)
+      (modus-vivendi-theme-fringes 'intense)
+      (modus-vivendi-theme-intense-hl-line t)
+      (modus-vivendi-theme-intense-paren-match t)
+      (modus-vivendi-theme-org-blocks 'rainbow)
+      (modus-vivendi-theme-scale-headings t)
+      (modus-vivendi-theme-variable-pitch-headings t)
+      :config
+      (load-theme 'modus-vivendi t))
 #+END_SRC
+
 *** Parenthesis and other delimiters
 I like the matching parenthesis to match to help me understand the context of where I'm at.
 #+BEGIN_SRC emacs-lisp
@@ -231,32 +241,43 @@ This might be a bit redundant with ~show-paren-mode~, but this helps me with con
     :defer
     :hook (prog-mode . rainbow-delimiters-mode))
 #+END_SRC
+
 *** Modeline
 The default modeline is, in my opinion, dated and ugly. ~doom-modeline~
 is the best modeline that I have tried thus far. I increase the ~vcs-max-length~
 due to extra long branch names that I often use.
 #+BEGIN_SRC emacs-lisp
-  ;; MODELINE
-(use-package doom-modeline
-    :demand t
-    :hook (after-init . doom-modeline-mode)
-    :custom
-    (doom-modeline-vcs-max-length 40)
-    (doom-modeline-indent-info t)
+    ;; MODELINE
+  (use-package doom-modeline
+      :disabled t
+      :demand t
+      :hook (after-init . doom-modeline-mode)
+      :custom
+      (doom-modeline-vcs-max-length 40)
+      (doom-modeline-indent-info t)
+      :config
+      (display-time-mode 1))
+
+  (use-package powerline
+    :init
+    (defpowerline powerline-minor-modes "")
     :config
-    (display-time-mode 1))
+    (powerline-vim-theme))
 #+END_SRC
+
 *** Yes or no prompt
 I really don't like having to fully type out 'yes' and 'no' everytime.
 #+BEGIN_SRC emacs-lisp
 (defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
+
 *** Icons
 A lot of the addons that I'm using have support for ~all-the-icons~ to use fancy
 icons in my completion buffer, startpage, etc.
 #+BEGIN_SRC emacs-lisp
 (use-package all-the-icons)
 #+END_SRC
+
 *** Startpage
 Ideally I would have a custom start page. For now ~dashboard~ suits my purposes
 and doesn't seem overly resource heavy.
@@ -277,6 +298,7 @@ and doesn't seem overly resource heavy.
   ; (setq inhibit-startup-screen t)
   ; (setq initial-buffer-choice "~/.custom-emacs.d/init.el")
 #+END_SRC
+
 *** Indention
 I pulled this off of emacs-for-vimmers. I prefer 4 spaces to tabs.
 #+BEGIN_SRC emacs-lisp
@@ -289,6 +311,7 @@ I pulled this off of emacs-for-vimmers. I prefer 4 spaces to tabs.
 (setq-default tab-width 4)
 (setq-default evil-shift-round nil)
 #+END_SRC
+
 *** Window Splitting
 Golden ratio allows for nicely utilizing your active buffer while still being able to see what's going on in the other frames.
 Currently commented out until I have time to tweak it into submission.
@@ -300,6 +323,7 @@ Currently commented out until I have time to tweak it into submission.
     :config
     (golden-ratio-mode 1))
 #+END_SRC
+
 *** Buffer Switching
 I dislike the default for prepending numbers to buffers with the same name.
 This changes them to use the path to delinate them.
@@ -307,6 +331,7 @@ This changes them to use the path to delinate them.
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
 #+END_SRC emacs-lisp
+
 ** Completion
 *** Framework
 Currently using Ivy. I've found that it works the best with the least amount of configuration to the other frameworks I've tried.
@@ -352,6 +377,7 @@ Prost uses icomplete, which would be interesting to try, however it requires a l
     :config
     (all-the-icons-ivy-rich-mode 1))
 #+END_SRC
+
 *** Which-key
 I love having the suggestions, so if I ever forget my binds I can just look.
 #+BEGIN_SRC emacs-lisp
@@ -362,6 +388,7 @@ I love having the suggestions, so if I ever forget my binds I can just look.
     :config
     (which-key-mode))
 #+END_SRC
+
 *** Spelling
 Flyspell just works and works well.
 #+BEGIN_SRC emacs-lisp
@@ -375,17 +402,18 @@ Flyspell just works and works well.
 (use-package flyspell-correct-ivy
   :after flyspell-correct)
 #+END_SRC
+
 ** Help menus
 Improved help menus with ~helpful~.
 #+BEGIN_SRC emacs-lisp
   (use-package helpful
       :defer t
-      :custom
+     :custom
       (counsel-describe-function-function #'helpful-callable)
       (counsel-describe-variable-function #'helpful-variable))
   (general-def helpful-mode-map
        :states '(normal motion emacs)
-       "q" 'kill-buffer-and-window)
+       "q" 'quit-window)
 #+END_SRC
 
 ** Scratch
@@ -393,6 +421,7 @@ Prefer a scratch message that reminds me of the keybinds I always forget.
 #+BEGIN_SRC emacs-lisp
 (setq initial-scratch-message ";;C-j evaluate\n;;C-x C-e evalutate-last-sexp;;C-x C-f to save buffer\n\n")
 #+END_SRC
+
 ** Development
 *** Completion
 Company is the default. Everything supports it and it works well.
@@ -403,6 +432,7 @@ Company is the default. Everything supports it and it works well.
     :config
     (global-company-mode))
 #+END_SRC
+
 *** Checkers
 Flycheck to show syntax issues
 #+BEGIN_SRC emacs-lisp
@@ -410,6 +440,7 @@ Flycheck to show syntax issues
     :defer t
     :init (global-flycheck-mode))
 #+END_SRC
+
 *** Source Control
 Magit is the default for git. One of the main reasons to use Emacs.
 #+BEGIN_SRC emacs-lisp
@@ -423,10 +454,12 @@ Magit is the default for git. One of the main reasons to use Emacs.
 #+END_SRC
 Add evil keybinds for magit.
 #+BEGIN_SRC emacs-lisp
-  (use-package evil-magit
-      :defer t
-      :after (magit evil))
+      (use-package evil-magit
+          :after (magit evil)
+          :config
+          (evil-magit-init))
 #+END_SRC
+
 *** Projects
 Projectile is great for doing project related activities.
 #+BEGIN_SRC emacs-lisp
@@ -437,11 +470,7 @@ Projectile is great for doing project related activities.
     :config
     (projectile-mode +1))
 #+END_SRC
-*** prog-mode
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook 'eldoc-mode)
-  (add-hook 'prog-mode-hook 'which-function-mode)
-#+END_SRC
+
 *** Python
 #+BEGIN_SRC emacs-lisp
   (use-package anaconda-mode
@@ -455,26 +484,47 @@ Projectile is great for doing project related activities.
     :config
     (add-to-list 'company-backends 'company-anaconda))
 #+END_SRC
+
 *** Haskell
 #+BEGIN_SRC emacs-lisp
   (use-package haskell-mode
     :defer t
     :config
+    (evil-set-initial-state 'interactive-haskell-mode 'insert)
     (haskell-indentation-mode +1)
     (interactive-haskell-mode +1))
+
+  (use-package company-ghc
+    :defer t
+    :config
+    (add-to-list 'company-backends 'company-ghc))
 
   (use-package flycheck-haskell
       :defer t
       :after (haskell-mode flycheck)
       :init (add-hook 'haskell-mode-hook #'flycheck-haskell-setup))
+
+  (my/local-leader-def haskell-mode-map
+       "r" 'haskell-interactive-bring
+       "k" 'haskell-interactive-mode-clear
+       "c" 'haskell-compile
+       "t" 'haskell-process-do-type
+       "i" 'haskell-process-do-info
+       "l" 'haskell-process-load-or-reload)
+
+  (my/local-leader-def interactive-haskell-mode-map
+       "c" 'haskell-interactive-mode-clear
+       "l" 'haskell-process-load-or-reload)
 #+END_SRC
+
 *** Elisp
 **** Keybinds
 #+BEGIN_SRC emacs-lisp
-(my/local-leader emacs-lisp-mode-map
+(my/local-leader-def emacs-lisp-mode-map
      "x" 'eval-last-sexp
      "e" 'eval-expression)
 #+END_SRC
+
 ** Org
 *** Setup
 #+BEGIN_SRC emacs-lisp
@@ -513,17 +563,15 @@ Projectile is great for doing project related activities.
           :head "#+title: %<%Y-%m-%d>\n#+roam_tags\n\n")))
 
   (use-package org
+      :ensure org-plus-contrib
       :custom
       (org-directory "~/org/")
       (org-babel-process-comment-text 'my/remove-properties)
       (org-agenda-files (cons "~/.emacs.d/Drew.org" (directory-files-recursively "~/org/notes" "\\.org$")))
       (org-refile-targets '((my/refile-targets :maxlevel . 1)))
-      (org-link-file-path-type "absolute"))
-
-  (use-package org-contrib-plus
-    :after org
-    :config
-    (require 'ox-confluence))
+      (org-link-file-path-type "absolute")
+      :config
+      (require 'ox-confluence))
 
   (use-package org-roam
     :after org
@@ -533,11 +581,18 @@ Projectile is great for doing project related activities.
     (org-roam-dailies-capture-templates my/dailies-capture-templates)
     :config
     (add-hook 'after-init-hook 'org-roam-mode))
+
+  (use-package org-superstar
+    :after org
+    :init
+    (setq org-hide-leading-stars t)
+    :config
+    (add-hook 'org-mode-hook (lambda() (org-superstar-mode 1))))
 #+END_SRC
 
 *** Keymaps
 #+BEGIN_SRC emacs-lisp
-  (my/local-leader org-mode-map
+  (my/local-leader-def org-mode-map
       "c" 'org-confluence-export-as-confluence
       "e" 'org-edit-special
       "i" 'org-roam-insert
