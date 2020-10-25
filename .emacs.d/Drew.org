@@ -9,13 +9,13 @@
 ** Startup Optimizations
 Some optimizations to speed up start-up time (per John Wiegley).
 #+BEGIN_SRC emacs-lisp
-(defvar file-name-handler-alist-old file-name-handler-alist)
-(setq package-enable-at-startup nil
-      file-name-handler-alist nil
-      message-log-max 16384
-      gc-cons-threshold 402653184
-      gc-cons-percentage 0.6
-      auto-window-vscroll nil)
+  (defvar file-name-handler-alist-old file-name-handler-alist)
+  (setq package-enable-at-startup nil
+        file-name-handler-alist nil
+        message-log-max 16384
+        gc-cons-threshold 402653184
+        gc-cons-percentage 0.6
+        auto-window-vscroll nil)
 #+END_SRC
 
 ** Package Management
@@ -192,10 +192,11 @@ I like to always display line numbers.
 *** UI Elements
 Remove unnecessary UI elements: scroll-bar, tool-bar, menu-bar, tool-tips.
 #+BEGIN_SRC emacs-lisp
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
-(tooltip-mode -1)
-(menu-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (tooltip-mode -1)
+  (menu-bar-mode -1)
+  (global-eldoc-mode -1)
 #+END_SRC
 
 *** Ring bell
@@ -262,7 +263,7 @@ due to extra long branch names that I often use.
     :init
     (defpowerline powerline-minor-modes "")
     :config
-    (powerline-vim-theme))
+    (powerline-default-theme))
 #+END_SRC
 
 *** Yes or no prompt
@@ -319,7 +320,7 @@ Currently commented out until I have time to tweak it into submission.
   (use-package golden-ratio
     :disabled
     :init
-    (setq golden-ratio-exclude-modes 'magit-mode)
+    (setq golden-ratio-excluded-modes 'magit-mode)
     :config
     (golden-ratio-mode 1))
 #+END_SRC
@@ -337,45 +338,47 @@ This changes them to use the path to delinate them.
 Currently using Ivy. I've found that it works the best with the least amount of configuration to the other frameworks I've tried.
 Prost uses icomplete, which would be interesting to try, however it requires a lot of configuration to get correct.
 #+BEGIN_SRC emacs-lisp
-(use-package swiper
-    :custom
-    (swiper-goto-start-of-match t))
+  (use-package swiper
+      :custom
+      (swiper-goto-start-of-match t))
 
-(use-package counsel)
+  (use-package counsel)
 
-(use-package ivy
-    :custom
-    (ivy-count-format " (%d/%d) ")
-    (setq ivy-re-builders-alist
-          '((t . ivy--regex-ignore-order)))
-    :bind (:map ivy-minibuffer-map
-           ("TAB" . ivy-alt-done)
-           ("C-l" . ivy-alt-done)
-           ("C-j" . ivy-next-line)
-           ("C-k" . ivy-previous-line)
-           ("C-o" . ivy-dispatching-done)
-           :map ivy-switch-buffer-map
-           ("C-k" . ivy-previous-line)
-           ("C-j" . ivy-next-line)
-           ("C-d" . ivy-switch-buffer-kill)
-           :map ivy-reverse-i-search-map
-           ("C-k" . ivy-previous-line)
-           ("C-j" . ivy-next-line)
-           ("C-d" . ivy-reverse-i-search-kill))
-    :config
-    (ivy-mode 1))
+  (use-package ivy
+      :custom
+      (ivy-count-format " (%d/%d) ")
+      (setq ivy-re-builders-alist
+            '((t . ivy--regex-ignore-order)))
+      :bind (:map ivy-minibuffer-map
+             ("TAB" . ivy-alt-done)
+             ("C-l" . ivy-alt-done)
+             ("C-j" . ivy-next-line)
+             ("C-k" . ivy-previous-line)
+             ("C-o" . ivy-dispatching-done)
+             :map ivy-switch-buffer-map
+             ("C-k" . ivy-previous-line)
+             ("C-j" . ivy-next-line)
+             ("C-d" . ivy-switch-buffer-kill)
+             :map ivy-reverse-i-search-map
+             ("C-k" . ivy-previous-line)
+             ("C-j" . ivy-next-line)
+             ("C-d" . ivy-reverse-i-search-kill))
+      :hooks
+      (ivy-mode . visual-line-mode)
+      :config
+      (ivy-mode 1))
 
-(use-package ivy-rich
-    :requires ivy
-    :init
-    (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
-    :config
-    (ivy-rich-mode 1))
+  (use-package ivy-rich
+      :requires ivy
+      :init
+      (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line)
+      :config
+      (ivy-rich-mode 1))
 
-(use-package all-the-icons-ivy-rich
-    :requires (ivy-rich all-the-icons)
-    :config
-    (all-the-icons-ivy-rich-mode 1))
+  (use-package all-the-icons-ivy-rich
+      :requires (ivy-rich all-the-icons)
+      :config
+      (all-the-icons-ivy-rich-mode 1))
 #+END_SRC
 
 *** Which-key
@@ -426,18 +429,37 @@ Prefer a scratch message that reminds me of the keybinds I always forget.
 *** Completion
 Company is the default. Everything supports it and it works well.
 #+BEGIN_SRC emacs-lisp
-  ;; SECTION -- DEV
-(use-package company
-    :defer t
-    :config
-    (global-company-mode))
+    ;; SECTION -- DEV
+  (use-package company
+      :config
+      (global-company-mode)
+      :bind
+      (:map company-active-map
+            ("C-n" . company-select-next)
+            ("C-p" . company-select-previous))
+      :custom
+      (company-minimum-prefix-length 1)
+      (company-tooltip-align-annotations t)
+      (company-require-match 'never)
+      (company-idle-delay 0.1)
+      (company-show-numbers t))
 #+END_SRC
-
+**** Company TabNine
+     Add TabNine completion to Company.
+     #+BEGIN_SRC emacs-lisp
+       (use-package company-tabnine
+         :defer 1
+         :custom
+         (company tabnine-max-num-results 9)
+         :hook
+         (kill-emacs . company-tabnine-kill-process)
+         :config
+         (add-to-list 'company-backends #'company-tabnine))
+     #+END_SRC
 *** Checkers
 Flycheck to show syntax issues
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
-    :defer t
     :init (global-flycheck-mode))
 #+END_SRC
 
@@ -463,12 +485,12 @@ Add evil keybinds for magit.
 *** Projects
 Projectile is great for doing project related activities.
 #+BEGIN_SRC emacs-lisp
-(use-package projectile
-    :defer t
-    :custom
-    (projectile-completion-system 'ivy)
-    :config
-    (projectile-mode +1))
+  (use-package projectile
+      :defer t
+      :custom
+      (projectile-completion-system 'ivy)
+      :config
+      (projectile-mode +1))
 #+END_SRC
 
 *** Python
@@ -528,66 +550,67 @@ Projectile is great for doing project related activities.
 ** Org
 *** Setup
 #+BEGIN_SRC emacs-lisp
-  (defun my/remove-properties (str)
-    (string-join (seq-filter (lambda (st) (not (string-prefix-p ":" st))) (split-string str "\n")) "\n"))
+    (defun my/remove-properties (str)
+      (string-join (seq-filter (lambda (st) (not (string-prefix-p ":" st))) (split-string str "\n")) "\n"))
 
-  (defvar my/refile-targets
-    (mapcar 'abbreviate-file-name
-            (split-string
-             (shell-command-to-string "find -L ~/org -name '*.org'") "\n")))
+    (defvar my/refile-targets
+      (mapcar 'abbreviate-file-name
+              (split-string
+               (shell-command-to-string "find -L ~/org -name '*.org'") "\n")))
 
-  (defvar my/capture-templates
-      '(
-          ("b" "bullet" entry (function org-roam--capture-get-point)
-          "* %?\n"
-          :file-name "inbox.org"
-          :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
-          :unnarrowed t)
-          ("t" "todo" entry (function org-roam--capture-get-point)
-          "* TODO %?\n"
-          :file-name "inbox.org"
-          :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
-          :unnarrowed t)
-          ("s" "slip" plain (function org-roam--capture-get-point)
-          "%?"
-          :file-name "${slug}"
-          :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
-          :unnarrowed t)))
+    (defvar my/capture-templates
+        '(
+            ("b" "bullet" entry (function org-roam--capture-get-point)
+            "* %?\n"
+            :file-name "inbox.org"
+            :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
+            :unnarrowed t)
+            ("t" "todo" entry (function org-roam--capture-get-point)
+            "* TODO %?\n"
+            :file-name "inbox.org"
+            :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
+            :unnarrowed t)
+            ("s" "slip" plain (function org-roam--capture-get-point)
+            "%?"
+            :file-name "${slug}"
+            :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
+            :unnarrowed t)))
 
-  (defvar my/dailies-capture-templates
-      '(
-          ("d" "daily" plain (function org-roam--capture-get-point)
-          ""
-          :immediate-finish t
-          :file-name "%<%Y-%m-%d>"
-          :head "#+title: %<%Y-%m-%d>\n#+roam_tags\n\n")))
+    (defvar my/dailies-capture-templates
+        '(
+            ("d" "daily" plain (function org-roam--capture-get-point)
+            ""
+            :immediate-finish t
+            :file-name "%<%Y-%m-%d>"
+            :head "#+title: %<%Y-%m-%d>\n#+roam_tags\n\n")))
 
-  (use-package org
-      :ensure org-plus-contrib
+    (use-package org
+        :ensure org-plus-contrib
+        :custom
+        (org-directory "~/org/")
+        (org-babel-process-comment-text 'my/remove-properties)
+        (org-agenda-files (cons "~/.emacs.d/Drew.org" (directory-files-recursively "~/org/notes" "\\.org$")))
+        (org-refile-targets '((my/refile-targets :maxlevel . 1)))
+        (org-link-file-path-type "absolute")
+        :config
+        (require 'ox-confluence)
+        (add-hook 'org-mode-hook #'visual-line-mode))
+
+    (use-package org-roam
+      :after org
       :custom
-      (org-directory "~/org/")
-      (org-babel-process-comment-text 'my/remove-properties)
-      (org-agenda-files (cons "~/.emacs.d/Drew.org" (directory-files-recursively "~/org/notes" "\\.org$")))
-      (org-refile-targets '((my/refile-targets :maxlevel . 1)))
-      (org-link-file-path-type "absolute")
+      (org-roam-directory "~/org/notes")
+      (org-roam-capture-templates my/capture-templates)
+      (org-roam-dailies-capture-templates my/dailies-capture-templates)
       :config
-      (require 'ox-confluence))
+      (add-hook 'after-init-hook 'org-roam-mode))
 
-  (use-package org-roam
-    :after org
-    :custom
-    (org-roam-directory "~/org/notes")
-    (org-roam-capture-templates my/capture-templates)
-    (org-roam-dailies-capture-templates my/dailies-capture-templates)
-    :config
-    (add-hook 'after-init-hook 'org-roam-mode))
-
-  (use-package org-superstar
-    :after org
-    :init
-    (setq org-hide-leading-stars t)
-    :config
-    (add-hook 'org-mode-hook (lambda() (org-superstar-mode 1))))
+    (use-package org-superstar
+      :after org
+      :init
+      (setq org-hide-leading-stars t)
+      :config
+      (add-hook 'org-mode-hook (lambda() (org-superstar-mode 1))))
 #+END_SRC
 
 *** Keymaps
