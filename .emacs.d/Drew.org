@@ -193,7 +193,11 @@ I like to always display line numbers.
 #+BEGIN_SRC emacs-lisp
 (global-display-line-numbers-mode)
 #+END_SRC
-
+*** Time in Modeline
+I like to have the time displayed in my modeline.
+#+begin_src emacs-lisp
+(display-time-mode 1)
+#+end_src
 *** UI Elements
 Remove unnecessary UI elements: scroll-bar, tool-bar, menu-bar, tool-tips.
 #+BEGIN_SRC emacs-lisp
@@ -253,16 +257,15 @@ The default modeline is, in my opinion, dated and ugly. ~doom-modeline~
 is the best modeline that I have tried thus far. I increase the ~vcs-max-length~
 due to extra long branch names that I often use.
 #+BEGIN_SRC emacs-lisp
-    ;; MODELINE
   (use-package doom-modeline
       :disabled t
       :demand t
       :hook (after-init . doom-modeline-mode)
+      :init
+      (display-time-mode 1)
       :custom
       (doom-modeline-vcs-max-length 40)
-      (doom-modeline-indent-info t)
-      :config
-      (display-time-mode 1))
+      (doom-modeline-indent-info t))
 
   (use-package powerline
     :init
