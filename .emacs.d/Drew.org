@@ -17,7 +17,6 @@ Some optimizations to speed up start-up time (per John Wiegley).
         gc-cons-percentage 0.6
         auto-window-vscroll nil)
 #+END_SRC
-
 ** Package Management
 *** Package Sources
 + Add the "melpa" source because all the good stuff is on MELPA.
@@ -29,20 +28,19 @@ Some optimizations to speed up start-up time (per John Wiegley).
 (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 (package-initialize)
 #+END_SRC
-
 *** Macros
 Use-package macros are very helpful for managing and configuring all the packages I install.
 + If use-package isn't installed, install it.
 + Load use-package.
 + Set use-package to install any packages that are configured but not installed.
 #+BEGIN_SRC emacs-lisp
-(when (not (package-installed-p 'use-package))
-  (package-refresh-contents)
-  (package-install 'use-package))
+    (when (not (package-installed-p 'use-package))
+      (package-refresh-contents)
+      (package-install 'use-package))
 
-(eval-when-compile
-  (require 'use-package))
-(setq use-package-always-ensure t)
+    (eval-when-compile
+      (require 'use-package))
+    (setq use-package-always-ensure t)
 #+END_SRC
 
 ** Keybinds
@@ -308,7 +306,7 @@ and doesn't seem overly resource heavy.
   ; (setq initial-buffer-choice "~/.custom-emacs.d/init.el")
 #+END_SRC
 
-*** Indention
+*** Indentation
 I pulled this off of emacs-for-vimmers. I prefer 4 spaces to tabs.
 #+BEGIN_SRC emacs-lisp
 (setq default-tab-width 4)
@@ -322,8 +320,7 @@ I pulled this off of emacs-for-vimmers. I prefer 4 spaces to tabs.
 #+END_SRC
 
 *** Window Splitting
-Golden ratio allows for nicely utilizing your active buffer while still being able to see what's going on in the other frames.
-Currently commented out until I have time to tweak it into submission.
+Golden ratio allows for nicely utilizing your active buffer while still being able to see what's going on in the other frames. Currently disabled until I have time to tweak it into submission.
 #+BEGIN_SRC emacs-lisp
   (use-package golden-ratio
     :disabled
@@ -334,17 +331,15 @@ Currently commented out until I have time to tweak it into submission.
 #+END_SRC
 
 *** Buffer Switching
-I dislike the default for prepending numbers to buffers with the same name.
-This changes them to use the path to delinate them.
+I dislike the default for prepending numbers to buffers with the same name. This changes them to use the path to delineate them.
 #+BEGIN_SRC emacs-lisp
 (require 'uniquify)
 (setq uniquify-buffer-name-style 'forward)
 #+END_SRC emacs-lisp
 
 ** Completion
-*** Framework
-Currently using Ivy. I've found that it works the best with the least amount of configuration to the other frameworks I've tried.
-Prost uses icomplete, which would be interesting to try, however it requires a lot of configuration to get correct.
+*** Framework 
+Currently using Ivy. I've found that it works the best with the least amount of configuration to the other frameworks I've tried. Prost uses icomplete, which would be interesting to try, however it requires a lot of configuration to get correct. I've never really given helm a try because it seems so heavy. However, it also has some really nice functionality.
 #+BEGIN_SRC emacs-lisp
   (use-package swiper
       :custom
@@ -415,7 +410,7 @@ Flyspell just works and works well.
 #+END_SRC
 
 ** Help menus
-Improved help menus with ~helpful~.
+Improved help menus with =helpful=
 #+BEGIN_SRC emacs-lisp
   (use-package helpful
       :defer t
@@ -435,7 +430,7 @@ Prefer a scratch message that reminds me of the keybinds I always forget.
 
 ** Development
 *** Completion
-Company is the default. Everything supports it and it works well.
+Company is the default. Everything supports it and it works well. Pulled from [[https://github.com/MatthewZMD/.emacs.d][Matthew Zeng's config]].
 #+BEGIN_SRC emacs-lisp
     ;; SECTION -- DEV
   (use-package company
