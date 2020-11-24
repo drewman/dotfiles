@@ -84,92 +84,97 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
 
 **** Global binds
 #+BEGIN_SRC emacs-lisp
-(use-package general)
+  (use-package general)
 
-(defun my/open-config
-    (interactive)
-    (find-file "~/.emacs.d/Drew.org"))
+  (defun my/open-config()
+      (interactive)
+      (find-file "~/.emacs.d/Drew.org"))
 
-(general-define-key
+  (general-define-key
+      :states '(normal visual insert emacs)
+      :prefix "SPC"
+      :non-normal-prefix "C-SPC"
+      "p" '(:keymap projectile-command-map :package projectile :which-key "projectile")
+      "x" '(counsel-M-x :which-key "M-x")
+      "." '(counsel-find-file :which-key "find file")
+      "'" 'ivy-resume
+
+      "b" '(:ignore t :which-key "buffer/bookmark")
+      "bb" 'counsel-switch-buffer
+      "bc" 'kill-current-buffer
+      "bd" 'counsel-bookmarked-directory
+      "bD" 'bookmark-delete
+      "be" 'eval-buffer
+      "bk" 'kill-buffer
+      "bl" '(evil-switch-to-windows-last-buffer :which-key "last buffer")
+      "bm" 'counsel-bookmark
+      "bu" 'bookmark-bmenu-list
+      "bw" 'kill-buffer-and-window
+
+      "d" '(:ignore t :which-key "describe")
+      "da" 'counsel-describe-face
+      "db" 'describe-bindings
+      "dc" '(helpful-command :which-key "describe commands")
+      "df" '(helpful-function :which-key "describe function")
+      "dh" 'info-emacs-manual
+      "dk" '(helpful-key :which-key "describe key")
+      "dl" '(counsel-find-library :which-key "find library")
+      "dm" 'describe-mode
+      "do" '(helpful-macro :which-key "describe macro")
+      "dp" '(helpful-at-point :which-key "describe at point")
+      "ds" '(counsel-describe-symbol :which-key "describe symbol")
+      "dv" '(counsel-describe-variable :which-key "describe variable")
+      "dV" '(counsel-set-variable :which-key "set variable")
+
+      "f" '(:ignore t :which-key "file")
+      "ff" '(counsel-find-file :which-key "find file")
+      "fi" '(imenu :which-key "jump in file")
+      "fj" '(counsel-file-jump :which-key "jump to file")
+      "fp" '(my/open-config :which-key "open personal config")
+      "fs" 'save-buffer
+      "fM" 'mkdir
+      "fN" 'create-empty-file
+
+      "g" '(:ignore t :which-key "magit")
+      "gb" 'magit-branch-and-checkout
+      "gc" 'magit-clone
+      "gd" 'magit-diff-working-tree
+      "gg" 'magit-status
+      "gi" 'magit-init
+      "gl" 'magit-log-current
+
+      "o" '(:ignore t :which-key "org")
+      "oa" 'org-agenda
+      "oo" 'org-capture
+      "of" '(deft :which-key "find org file")
+
+      "w" '(:ignore t :which-key "window")
+      "wb" 'balance-windows
+      "wd" 'delete-other-windows
+      "wn" 'evil-window-new
+      "wo" 'other-window
+      "wq" 'evil-quit
+      "ws" 'evil-window-split
+      "wv" 'evil-window-vsplit
+      "wh" 'evil-window-left
+      "wl" 'evil-window-right
+      "wj" 'evil-window-down
+      "wk" 'evil-window-up
+   )
+
+  (general-create-definer my/local-leader-def
     :states '(normal visual insert emacs)
-    :prefix "SPC"
-    :non-normal-prefix "C-SPC"
-    "p" '(projectile-command-map :which-key "projectile")
-    "x" '(counsel-M-x :which-key "M-x")
-    "." '(counsel-find-file :which-key "find file")
-    "'" 'ivy-resume
+    :prefix "SPC l"
+    :non-normal-prefix "C-SPC l"
+    "" '(:ignore t :which-key "local"))
 
-    "f" '(:ignore t :which-key "file")
-    "ff" 'counsel-find-file
-    "fj" 'counsel-file-jump
-    "fp" '(my/open-config :which-key "open personal config")
-    "fs" 'save-buffer
-    "fM" 'mkdir
-    "fN" 'create-empty-file
+  (general-define-key
+       :states 'visual
+       "C-c c" 'comment-or-uncomment-region)
 
-    "b" '(:ignore t :which-key "buffer")
-    "bb" 'counsel-switch-buffer
-    "bc" 'kill-current-buffer
-    "bd" 'counsel-bookmarked-directory
-    "be" 'eval-buffer
-    "bk" 'kill-buffer
-    "bl" '(evil-switch-to-windows-last-buffer :which-key "last buffer")
-    "bm" 'counsel-bookmark
-    "bw" 'kill-buffer-and-window
-
-    "d" '(:ignore t :which-key "describe")
-    "da" 'counsel-describe-face
-    "db" 'describe-bindings
-    "dc" '(helpful-command :which-key "describe commands")
-    "df" '(helpful-function :which-key "describe function")
-    "dh" 'info-emacs-manual
-    "dk" '(helpful-key :which-key "describe key")
-    "dl" '(counsel-find-library :which-key "find library")
-    "dm" 'describe-mode
-    "do" '(helpful-macro :which-key "describe macro")
-    "dp" '(helpful-at-point :which-key "describe at point")
-    "ds" '(counsel-describe-symbol :which-key "describe symbol")
-    "dv" '(counsel-describe-variable :which-key "describe variable")
-    "dV" '(counsel-set-variable :which-key "set variable")
-
-    "g" '(:ignore t :which-key "magit")
-    "gb" 'magit-branch-and-checkout
-    "gc" 'magit-clone
-    "gg" 'magit-status
-    "gi" 'magit-init
-    "gl" 'magit-log
-
-    "o" '(:ignore t :which-key "org")
-    "oa" 'org-agenda
-    "oo" 'org-capture
-
-    "w" '(:ignore t :which-key "window")
-    "wb" 'balance-windows
-    "wd" 'delete-other-windows
-    "wn" 'evil-window-new
-    "wo" 'other-window
-    "wq" 'evil-quit
-    "ws" 'evil-window-split
-    "wv" 'evil-window-vsplit
-    "wh" 'evil-window-left
-    "wl" 'evil-window-right
-    "wj" 'evil-window-down
-    "wk" 'evil-window-up
- )
-
-(general-create-definer my/local-leader-def
-  :states '(normal visual insert emacs)
-  :prefix "SPC l"
-  :non-normal-prefix "C-SPC l"
-  "" '(:ignore t :which-key "local"))
-
-(general-define-key
-     :states 'visual
-     "C-c c" 'comment-or-uncomment-region)
-
-(general-define-key
-     :states '(normal motion)
-     "/" 'swiper-isearch)
+  (general-define-key
+       :states '(normal motion)
+       "/" 'swiper-isearch)
 #+END_SRC
 
 ** env
@@ -631,4 +636,22 @@ Projectile is great for doing project related activities.
       "D" 'org-babel-demarcate-block
       "I" 'org-roam-insert-immediate
       "T" 'org-babel-tangle)
+
+  (general-define-key
+   :keymaps 'org-mode-map
+   :states 'normal
+   "gk" 'org-previous-visible-heading
+   "gj" 'org-next-visible-heading
+   "gK" 'org-backward-heading-same-level
+   "gJ" 'org-forward-heading-same-level
+   "C-c i" 'org-roam-insert
+   "C-c I" 'org-roam-insert-immediate)
 #+END_SRC
+** Snippets
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :init
+    (use-package yasnippet-snippets :after yasnippet)
+    :config
+    (yas-global-mode 1))
+#+end_src
