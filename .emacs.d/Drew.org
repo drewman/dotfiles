@@ -337,6 +337,20 @@ I dislike the default for prepending numbers to buffers with the same name. This
 (setq uniquify-buffer-name-style 'forward)
 #+END_SRC emacs-lisp
 
+*** Line breaking
+#+BEGIN_SRC emacs-lisp
+  (global-visual-line-mode)
+#+END_SRC
+*** Code Folding
+Turn on basic code folding. To enable =zo= and =zc= evil keybinds.
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook 'hs-minor-mode)
+  (add-hook 'org-mode-hook 'hs-minor-mode)
+#+END_SRC
+*** Line highlighting
+#+begin_src emacs-lisp :tangle yes
+  (global-hl-line-mode)
+#+end_src
 ** Completion
 *** Framework 
 Currently using Ivy. I've found that it works the best with the least amount of configuration to the other frameworks I've tried. Prost uses icomplete, which would be interesting to try, however it requires a lot of configuration to get correct. I've never really given helm a try because it seems so heavy. However, it also has some really nice functionality.
@@ -366,8 +380,7 @@ Currently using Ivy. I've found that it works the best with the least amount of 
              ("C-k" . ivy-previous-line)
              ("C-j" . ivy-next-line)
              ("C-d" . ivy-reverse-i-search-kill))
-      :hooks
-      (ivy-mode . visual-line-mode)
+      :hook (ivy-mode . visual-line-mode)
       :config
       (ivy-mode 1))
 
@@ -434,10 +447,11 @@ Company is the default. Everything supports it and it works well. Pulled from [[
 #+BEGIN_SRC emacs-lisp
     ;; SECTION -- DEV
   (use-package company
-      :config
-      (global-company-mode)
+      :hook (after-init . global-company-mode)
       :bind
       (:map company-active-map
+            ([tab] . mz/smarter-tab-to-complete)
+            ("TAB" . mz/smarter-tab-to-complete)
             ("C-n" . company-select-next)
             ("C-p" . company-select-previous))
       :custom
@@ -567,73 +581,108 @@ Projectile is great for doing project related activities.
      "x" 'eval-last-sexp
      "e" 'eval-expression)
 #+END_SRC
+*** Web
+#+BEGIN_SRC emacs-lisp
+  (use-package web-mode
+    :config
+    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode)))
+#+END_SRC
 
 ** Org
 *** Setup
 #+BEGIN_SRC emacs-lisp
-    (defun my/remove-properties (str)
-      (string-join (seq-filter (lambda (st) (not (string-prefix-p ":" st))) (split-string str "\n")) "\n"))
+  (defun my/remove-properties (str)
+    (string-join (seq-filter (lambda (st) (not (string-prefix-p ":" st))) (split-string str "\n")) "\n"))
 
-    (defvar my/refile-targets
-      (mapcar 'abbreviate-file-name
-              (split-string
-               (shell-command-to-string "find -L ~/org -name '*.org'") "\n")))
+  (defvar my/refile-targets
+    (mapcar 'abbreviate-file-name
+           (split-string
+             (shell-command-to-string "find -L ~/org -name '*.org'") "\n")))
 
-    (defvar my/capture-templates
-        '(
-            ("b" "bullet" entry (function org-roam--capture-get-point)
-            "* %?\n"
-            :file-name "inbox.org"
-            :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
-            :unnarrowed t)
-            ("t" "todo" entry (function org-roam--capture-get-point)
-            "* TODO %?\n"
-            :file-name "inbox.org"
-            :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
-            :unnarrowed t)
-            ("s" "slip" plain (function org-roam--capture-get-point)
-            "%?"
-            :file-name "${slug}"
-            :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
-            :unnarrowed t)))
+  (defvar my/capture-templates
+      '(
+          ("b" "bullet" entry (function org-roam--capture-get-point)
+          "* %?\n"
+          :file-name "inbox.org"
+          :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
+          :unnarrowed t)
+          ("t" "todo" entry (function org-roam--capture-get-point)
+          "* TODO %?\n"
+          :file-name "inbox.org"
+          :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
+          :unnarrowed t)
+          ("s" "slip" plain (function org-roam--capture-get-point)
+          "%?"
+          :file-name "${slug}"
+          :head "#+title: ${title}\n#+author: %n\n#+date: %<%m/%d/%Y>\n\n"
+          :unnarrowed t)))
 
-    (defvar my/dailies-capture-templates
-        '(
-            ("d" "daily" plain (function org-roam--capture-get-point)
-            ""
-            :immediate-finish t
-            :file-name "%<%Y-%m-%d>"
-            :head "#+title: %<%Y-%m-%d>\n#+roam_tags\n\n")))
+  (defvar my/dailies-capture-templates
+      '(
+          ("d" "daily" plain (function org-roam--capture-get-point)
+          ""
+          :immediate-finish t
+          :file-name "%<%Y-%m-%d>"
+          :head "#+title: %<%Y-%m-%d>\n#+roam_tags\n\n")))
 
-    (use-package org
-        :ensure org-plus-contrib
-        :custom
-        (org-directory "~/org/")
-        (org-babel-process-comment-text 'my/remove-properties)
-        (org-agenda-files (cons "~/.emacs.d/Drew.org" (directory-files-recursively "~/org/notes" "\\.org$")))
-        (org-refile-targets '((my/refile-targets :maxlevel . 1)))
-        (org-link-file-path-type "absolute")
-        :config
-        (require 'ox-confluence)
-        (add-hook 'org-mode-hook #'visual-line-mode))
-
-    (use-package org-roam
-      :after org
+  (use-package org
+      :ensure org-plus-contrib
       :custom
-      (org-roam-directory "~/org/notes")
-      (org-roam-capture-templates my/capture-templates)
-      (org-roam-dailies-capture-templates my/dailies-capture-templates)
+      (org-directory "~/org/")
+      (org-babel-process-comment-text 'my/remove-properties)
+      (org-agenda-files '("~/org/notes"))
+      (org-refile-targets '((my/refile-targets :maxlevel . 1)))
+      (org-link-file-path-type "absolute")
+      (org-ellipsis " ▼ ")
+      (org-hide-emphasis-markers t)
       :config
-      (add-hook 'after-init-hook 'org-roam-mode))
+      (require 'ox-confluence)
+      (add-hook 'org-mode-hook 'org-indent-mode)
+      (add-hook 'org-mode-hook 'visual-line-mode))
 
-    (use-package org-superstar
-      :after org
-      :init
-      (setq org-hide-leading-stars t)
-      :config
-      (add-hook 'org-mode-hook (lambda() (org-superstar-mode 1))))
+  (use-package org-roam
+    :after org
+    :custom
+    (org-roam-directory "~/org/notes")
+    (org-roam-capture-templates my/capture-templates)
+    (org-roam-dailies-capture-templates my/dailies-capture-templates)
+    :config
+    (add-hook 'after-init-hook 'org-roam-mode))
+
+  (use-package org-superstar
+    :after org
+    :init
+    (setq org-hide-leading-stars t)
+    :config
+    (add-hook 'org-mode-hook (lambda() (org-superstar-mode 1))))
+
+  (use-package visual-fill-column
+    :init
+    (setq visual-fill-column-width 120)
+    :hook (org-mode . visual-fill-column-mode))
 #+END_SRC
 
+*** Deft
+#+BEGIN_SRC emacs-lisp
+  (use-package deft
+    :config
+    (setq deft-directory "~/org")
+    (setq deft-recursive t)
+  )
+#+END_SRC
+**** Keymaps
+#+BEGIN_SRC emacs-lisp
+  (general-define-key
+   :keymaps 'deft-mode-map
+   :states 'normal
+   "q" 'kill-current-buffer)
+
+  (general-define-key
+   :keymaps 'deft-mode-map
+   :states 'insert
+   "C-n" 'evil-next-line
+   "C-p" 'evil-previous-line)
+#+END_SRC
 *** Keymaps
 #+BEGIN_SRC emacs-lisp
   (my/local-leader-def org-mode-map
