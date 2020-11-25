@@ -188,8 +188,9 @@ For that purpose, ~exec-path-from-shell~ is used so all programs will be run sim
 ** Look and Feel
 *** Line Numbers
 I like to always display line numbers.
+Display line numbers in prog mode.
 #+BEGIN_SRC emacs-lisp
-(global-display-line-numbers-mode)
+  (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
 *** Time in Modeline
 I like to have the time displayed in my modeline.
@@ -630,7 +631,10 @@ Projectile is great for doing project related activities.
       :custom
       (org-directory "~/org/")
       (org-babel-process-comment-text 'my/remove-properties)
-      (org-agenda-files '("~/org/notes"))
+      (org-agenda-files '("~/org/notes/important_dates.org"))
+      (org-agenda-span 14)
+      (org-agenda-start-on-weekday nil)
+      (org-agenda-start-day "-3d")
       (org-refile-targets '((my/refile-targets :maxlevel . 1)))
       (org-link-file-path-type "absolute")
       (org-ellipsis " ▼ ")
@@ -659,6 +663,7 @@ Projectile is great for doing project related activities.
   (use-package visual-fill-column
     :init
     (setq visual-fill-column-width 120)
+    (setq visual-fill-column-center-text t)
     :hook (org-mode . visual-fill-column-mode))
 #+END_SRC
 
@@ -683,6 +688,14 @@ Projectile is great for doing project related activities.
    "C-n" 'evil-next-line
    "C-p" 'evil-previous-line)
 #+END_SRC
+**** Evil Org
+#+begin_src emacs-lisp
+  (use-package evil-org
+    :after org
+    :config
+    (add-hook 'org-mode-hook 'evil-org-mode))
+#+end_src
+
 *** Keymaps
 #+BEGIN_SRC emacs-lisp
   (my/local-leader-def org-mode-map
