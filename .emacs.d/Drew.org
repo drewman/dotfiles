@@ -130,6 +130,7 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
       "fj" '(counsel-file-jump :which-key "jump to file")
       "fp" '(my/open-config :which-key "open personal config")
       "fs" 'save-buffer
+      "fu" 'undo-tree-visualize
       "fM" 'mkdir
       "fN" 'create-empty-file
 
