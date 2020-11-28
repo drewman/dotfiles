@@ -741,6 +741,11 @@ Projectile is great for doing project related activities.
    "C-c i" 'org-roam-insert
    "C-c I" 'org-roam-insert-immediate)
 #+END_SRC
+I don't like using the Meta key because of it's awkward placement on my keyboard. However, the control key is rebound to ~CAPS LOCK~, so it works beautifully. So, I'll just use that instead. There is an issue where I can't get ~general.el~ to make ~<C-return>~ behave like ~<M-return>~. This was the compromise that got it working.
+#+begin_src emacs-lisp :tangle yes
+  (evil-define-key '(normal insert) 'evil-org-mode
+    (kbd "<C-return>") 'org-meta-return)
+#+end_src
 ** Snippets
 #+begin_src emacs-lisp
   (use-package yasnippet
