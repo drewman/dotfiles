@@ -656,6 +656,7 @@ Projectile is great for doing project related activities.
       (org-link-file-path-type "absolute")
       (org-ellipsis " ▼ ")
       (org-hide-emphasis-markers t)
+      (org-M-RET-may-split-line '((item . nil)))
       :config
       (require 'ox-confluence)
       (add-hook 'org-mode-hook 'org-indent-mode)
