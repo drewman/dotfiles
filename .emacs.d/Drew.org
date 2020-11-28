@@ -469,9 +469,7 @@ Company is the default. Everything supports it and it works well. Pulled from [[
             ([tab] . mz/smarter-tab-to-complete)
             ("TAB" . mz/smarter-tab-to-complete)
             ("C-n" . company-select-next)
-            ("C-p" . company-select-previous)
-            ([tab] . company-complete)
-            ("TAB" . company-complete))
+            ("C-p" . company-select-previous))
       :custom
       (company-minimum-prefix-length 1)
       (company-tooltip-align-annotations t)
