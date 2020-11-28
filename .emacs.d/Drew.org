@@ -29,7 +29,7 @@ Some optimizations to speed up start-up time (per John Wiegley).
 (package-initialize)
 #+END_SRC
 *** Macros
-Use-package macros are very helpful for managing and configuring all the packages I install.
+Use-package macros are very ~helpful~ for managing and configuring all the packages I install.
 + If use-package isn't installed, install it.
 + Load use-package.
 + Set use-package to install any packages that are configured but not installed.
@@ -358,7 +358,7 @@ I dislike the default for prepending numbers to buffers with the same name. This
   (global-visual-line-mode)
 #+END_SRC
 *** Code Folding
-Turn on basic code folding. To enable =zo= and =zc= evil keybinds.
+Turn on basic code folding. To enable ~zo~ and ~zc~ evil keybinds.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'prog-mode-hook 'hs-minor-mode)
   (add-hook 'org-mode-hook 'hs-minor-mode)
@@ -439,7 +439,7 @@ Flyspell just works and works well.
 #+END_SRC
 
 ** Help menus
-Improved help menus with =helpful=
+Improved help menus with ~helpful~
 #+BEGIN_SRC emacs-lisp
   (use-package helpful
       :defer t
