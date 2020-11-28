@@ -1,5 +1,5 @@
 #+TITLE: Drew's Emacs Configuration
-#+AUTHOR: Drew Bruce
++AUTHOR: Drew Bruce
 #+EMAIL: drew@drewbruce.com
 
 * Emacs Configuration
@@ -143,8 +143,9 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
 
       "o" '(:ignore t :which-key "org")
       "oa" 'org-agenda
-      "oo" 'org-capture
-      "of" '(deft :which-key "find org file")
+      "oo" 'org-roam-capture
+      "or" 'org-roam
+      "os" '(deft :which-key "search org files")
 
       "w" '(:ignore t :which-key "window")
       "wb" 'balance-windows
@@ -171,8 +172,21 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
        "C-c c" 'comment-or-uncomment-region)
 
   (general-define-key
+   "C--" 'text-scale-decrease
+   "C-+" 'text-scale-increase
+   "C-=" 'text-scale-increase)
+
+  (general-define-key
        :states '(normal motion)
        "/" 'swiper-isearch)
+
+  (general-define-key
+   :states 'insert
+   :keymaps '(org-mode-map prog-mode-map)
+   "C-n" 'next-line
+   "C-p" 'previous-line
+   "C-e" 'end-of-line
+   "C-a" 'beginning-of-line-next)
 #+END_SRC
 
 ** env
@@ -216,7 +230,7 @@ I dislike both an audio and a visual ring-bell. So remove the ring-bell altogeth
 *** Font
 Set the default display to use "JetBrains Mono" font with size 14.
 #+BEGIN_SRC emacs-lisp
-(set-face-attribute 'default nil :family "JetBrains Mono" :height 140)
+(set-face-attribute 'default nil :family "JetBrains Mono" :height 120)
 #+END_SRC
 
 *** Theme
@@ -326,7 +340,7 @@ Golden ratio allows for nicely utilizing your active buffer while still being ab
   (use-package golden-ratio
     :disabled
     :init
-    (setq golden-ratio-excluded-modes 'magit-mode)
+    (setq golden-ratio-exclude-modes 'magit-mode)
     :config
     (golden-ratio-mode 1))
 #+END_SRC
@@ -454,7 +468,9 @@ Company is the default. Everything supports it and it works well. Pulled from [[
             ([tab] . mz/smarter-tab-to-complete)
             ("TAB" . mz/smarter-tab-to-complete)
             ("C-n" . company-select-next)
-            ("C-p" . company-select-previous))
+            ("C-p" . company-select-previous)
+            ([tab] . company-complete)
+            ("TAB" . company-complete))
       :custom
       (company-minimum-prefix-length 1)
       (company-tooltip-align-annotations t)
