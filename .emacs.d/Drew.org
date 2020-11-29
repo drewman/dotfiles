@@ -108,22 +108,6 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
       "bm" 'counsel-bookmark
       "bu" 'bookmark-bmenu-list
       "bw" 'kill-buffer-and-window
-
-      "d" '(:ignore t :which-key "describe")
-      "da" 'counsel-describe-face
-      "db" 'describe-bindings
-      "dc" '(helpful-command :which-key "describe commands")
-      "df" '(helpful-function :which-key "describe function")
-      "dh" 'info-emacs-manual
-      "dk" '(helpful-key :which-key "describe key")
-      "dl" '(counsel-find-library :which-key "find library")
-      "dm" 'describe-mode
-      "do" '(helpful-macro :which-key "describe macro")
-      "dp" '(helpful-at-point :which-key "describe at point")
-      "ds" '(counsel-describe-symbol :which-key "describe symbol")
-      "dv" '(counsel-describe-variable :which-key "describe variable")
-      "dV" '(counsel-set-variable :which-key "set variable")
-
       "f" '(:ignore t :which-key "file")
       "ff" '(counsel-find-file :which-key "find file")
       "fi" '(imenu :which-key "jump in file")
@@ -142,11 +126,33 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
       "gi" 'magit-init
       "gl" 'magit-log-current
 
+      "h" '(:ignore t :which-key "help")
+      "ha" 'counsel-describe-face
+      "hb" 'describe-bindings
+      "hc" '(helpful-command :which-key "describe commands")
+      "hf" '(helpful-function :which-key "describe function")
+      "hG" 'customize-group
+      "hh" 'info-emacs-manual
+      "hk" '(helpful-key :which-key "describe key")
+      "hl" '(counsel-find-library :which-key "find library")
+      "hm" 'describe-mode
+      "ho" '(helpful-macro :which-key "describe macro")
+      "hp" '(helpful-at-point :which-key "describe at point")
+      "hs" '(counsel-describe-symbol :which-key "describe symbol")
+      "hv" '(counsel-describe-variable :which-key "describe variable")
+      "hV" '(counsel-set-variable :which-key "set variable")
+
       "o" '(:ignore t :which-key "org")
       "oa" 'org-agenda
-      "oo" 'org-roam-capture
+      "oo" '(org-roam-capture :which-key "org capture")
       "or" 'org-roam
       "os" '(deft :which-key "search org files")
+
+      "t" '(:ignore t :which-key "tabs")
+      "tj" 'tab-bar-switch-to-next-tab
+      "tk" 'tab-bar-switch-to-prev-tab
+      "tq" 'tab-bar-close-tab
+      "tt" 'tab-bar-new-tab
 
       "w" '(:ignore t :which-key "window")
       "wb" 'balance-windows
