@@ -213,6 +213,13 @@ Display line numbers in prog mode.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
+*** Tab Bar
+I like using tabs to give me a visual representation of my workspaces. Built-in tab bar works great.
+#+begin_src emacs-lisp
+  (setq tab-bar-show 1)
+  (tab-bar-mode)
+#+end_src
+
 *** Time in Modeline
 I like to have the time displayed in my modeline.
 #+begin_src emacs-lisp
