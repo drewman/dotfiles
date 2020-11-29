@@ -619,15 +619,30 @@ Projectile is great for doing project related activities.
 
 ** Org
 *** Setup
+Custom function to strip properties out of comments during tangles.
 #+BEGIN_SRC emacs-lisp
   (defun my/remove-properties (str)
     (string-join (seq-filter (lambda (st) (not (string-prefix-p ":" st))) (split-string str "\n")) "\n"))
-
-  (defvar my/refile-targets
+#+END_SRC
+Custom refiles with a helper function to rebuild targets. It would be nice to have this hooked to automatically run during an initial save in org mode. Also, I would like to have 
+#+BEGIN_SRC emacs-lisp
+  (defun my/build-refile-targets ()
     (mapcar 'abbreviate-file-name
-           (split-string
+            (split-string
              (shell-command-to-string "find -L ~/org -name '*.org'") "\n")))
 
+  (defvar my/refile-targets (my/build-refile-targets))
+
+  (defun my/rebuild-refile-targets ()
+        (setq my/refile-targets (my/build-refile-targets)))
+
+  ;;(defvar my/refile-targets
+    ;; (mapcar 'abbreviate-file-name
+    ;;        (split-string
+    ;;         (shell-command-to-string "find -L ~/org -name '*.org'") "\n")))
+#+END_SRC
+Capture templates
+#+BEGIN_SRC emacs-lisp
   (defvar my/capture-templates
       '(
           ("b" "bullet" entry (function org-roam--capture-get-point)
@@ -653,7 +668,9 @@ Projectile is great for doing project related activities.
           :immediate-finish t
           :file-name "%<%Y-%m-%d>"
           :head "#+title: %<%Y-%m-%d>\n#+roam_tags\n\n")))
-
+#+END_SRC
+Configure org and associated packages.
+#+BEGIN_SRC emacs-lisp
   (use-package org
       :ensure org-plus-contrib
       :custom
@@ -668,6 +685,7 @@ Projectile is great for doing project related activities.
       (org-ellipsis " ▼ ")
       (org-hide-emphasis-markers t)
       (org-M-RET-may-split-line '((item . nil)))
+      (org-insert-heading-respect-content t)
       :config
       (require 'ox-confluence)
       (add-hook 'org-mode-hook 'org-indent-mode)
@@ -731,6 +749,7 @@ Projectile is great for doing project related activities.
       "c" 'org-confluence-export-as-confluence
       "e" 'org-edit-special
       "i" 'org-roam-insert
+      "k" 'org-toggle-link-display
       "l" 'org-store-link
       "m" 'org-roam-dailies-tomorrow
       "n" 'org-narrow-to-subtree
@@ -750,14 +769,24 @@ Projectile is great for doing project related activities.
    "gk" 'org-previous-visible-heading
    "gj" 'org-next-visible-heading
    "gK" 'org-backward-heading-same-level
-   "gJ" 'org-forward-heading-same-level
+   "gJ" 'org-forward-heading-same-level)
+
+  (general-define-key
+   :keymaps 'org-mode-map
+   :states '(normal insert)
    "C-c i" 'org-roam-insert
    "C-c I" 'org-roam-insert-immediate)
 #+END_SRC
 I don't like using the Meta key because of it's awkward placement on my keyboard. However, the control key is rebound to ~CAPS LOCK~, so it works beautifully. So, I'll just use that instead. There is an issue where I can't get ~general.el~ to make ~<C-return>~ behave like ~<M-return>~. This was the compromise that got it working.
 #+begin_src emacs-lisp :tangle yes
+  (defun my/org-c-return ()
+  "Custom function to bind to <C-return>"
+    (interactive)
+    (org-meta-return)
+    (evil-insert-state))
+
   (evil-define-key '(normal insert) 'evil-org-mode
-    (kbd "<C-return>") 'org-meta-return)
+    (kbd "<C-return>") 'my/org-c-return)
 #+end_src
 ** Snippets
 #+begin_src emacs-lisp
