@@ -2,46 +2,103 @@
 +AUTHOR: Drew Bruce
 #+EMAIL: drew@drewbruce.com
 
+* About
+This configuration is a derivative of Matthew Zeng's excellent [[https://github.com/MatthewZMD/.emacs.d][config]]. Also, heavily inspired by [[https://www.spacemacs.org/][spacemacs]] and [[https://github.com/hlissner/doom-emacs/][doom emacs]].
 * Emacs Configuration
 :PROPERTIES:
 :header-args: :tangle yes :comments org :results output silent
 :END:
 ** Startup Optimizations
-Some optimizations to speed up start-up time (per John Wiegley).
+Some optimizations to speed up start-up time.
 #+BEGIN_SRC emacs-lisp
-  (defvar file-name-handler-alist-old file-name-handler-alist)
-  (setq package-enable-at-startup nil
-        file-name-handler-alist nil
-        message-log-max 16384
-        gc-cons-threshold 402653184
-        gc-cons-percentage 0.6
-        auto-window-vscroll nil)
+  (defvar better-gc-cons-threshold 67108864 ; 64mb
+    "The default value to use for `gc-cons-threshold'.
+
+  If you experience freezing, decrease this.  If you experience stuttering, increase this.")
+
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (setq gc-cons-threshold better-gc-cons-threshold)
+              (setq file-name-handler-alist file-name-handler-alist-original)
+              (makunbound 'file-name-handler-alist-original)))
+  ;; Garbage Collect when Emacs is out of focus and avoid garbage collection when using minibuffer.
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (if (boundp 'after-focus-change-function)
+                  (add-function :after after-focus-change-function
+                                (lambda ()
+                                  (unless (frame-focus-state)
+                                    (garbage-collect))))
+                (add-hook 'after-focus-change-function 'garbage-collect))
+              (defun gc-minibuffer-setup-hook ()
+                (setq gc-cons-threshold (* better-gc-cons-threshold 2)))
+
+              (defun gc-minibuffer-exit-hook ()
+                (garbage-collect)
+                (setq gc-cons-threshold better-gc-cons-threshold))
+
+              (add-hook 'minibuffer-setup-hook #'gc-minibuffer-setup-hook)
+              (add-hook 'minibuffer-exit-hook #'gc-minibuffer-exit-hook)))
 #+END_SRC
 ** Package Management
 *** Package Sources
 + Add the "melpa" source because all the good stuff is on MELPA.
 + Add the "org" source to get (more) recent org-mode builds than what is included with emacs.
 #+BEGIN_SRC emacs-lisp
-;; Setup use-package
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
-(package-initialize)
+  (setq package-user-dir (expand-file-name "elpa" user-emacs-directory)
+        package-archives
+        '(("gnu"   . "https://elpa.gnu.org/packages/")
+          ("melpa" . "https://melpa.org/packages/")
+          ("org" . "https://orgmode.org/elpa/")
+          ))
 #+END_SRC
-*** Macros
-Use-package macros are very ~helpful~ for managing and configuring all the packages I install.
-+ If use-package isn't installed, install it.
-+ Load use-package.
-+ Set use-package to install any packages that are configured but not installed.
-#+BEGIN_SRC emacs-lisp
-    (when (not (package-installed-p 'use-package))
-      (package-refresh-contents)
-      (package-install 'use-package))
+*** Configure package manager
+#+begin_src emacs-lisp
+  (unless (bound-and-true-p package--initialized)
+    (setq package-enable-at-startup nil)          ; To prevent initializing twice
+    (package-initialize))
 
-    (eval-when-compile
-      (require 'use-package))
+  ;; set use-package-verbose to t for interpreted .emacs,
+  ;; and to nil for byte-compiled .emacs.elc.
+  (eval-and-compile
+    (setq use-package-verbose (not (bound-and-true-p byte-compile-current-file))))
+#+end_src
+
+*** Macros
+Use-package macros are very helpful for managing and configuring all the packages I install.
++ If use-package isn't installed, install it.
++ Set use-package 
++ Load use-package
+#+BEGIN_SRC emacs-lisp
+  ;; Install use-package if not installed
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+
+  (eval-and-compile
     (setq use-package-always-ensure t)
+    (setq use-package-expand-minimally t)
+    (setq use-package-compute-statistics t)
+    (setq use-package-enable-imenu-support t))
+
+  (eval-when-compile
+    (require 'use-package)
+    (require 'bind-key))
 #+END_SRC
+
+*** Auto Package Update
+Use ~auto-package-update~ to automatically update packages every week.
+#+begin_src emacs-lisp
+  (use-package auto-package-update
+    :if (not (daemonp))
+    :custom
+    (auto-package-update-interval 7) ;; in days
+    (auto-package-update-prompt-before-update t)
+    (auto-package-update-delete-old-versions t)
+    (auto-package-update-hide-results t)
+    :config
+    (auto-package-update-maybe))
+#+end_src
 
 ** Keybinds
 *** Evil
@@ -217,14 +274,11 @@ Display line numbers in prog mode.
 I like using tabs to give me a visual representation of my workspaces. Built-in tab bar works great.
 #+begin_src emacs-lisp
   (setq tab-bar-show 1)
-  (tab-bar-mode)
+  (setq tab-bar-close-button-show 'selected)
+  (setq tab-bar-new-button-show nil)
+  (setq tab-bar-new-tab-choice "*scratch*")
 #+end_src
 
-*** Time in Modeline
-I like to have the time displayed in my modeline.
-#+begin_src emacs-lisp
-(display-time-mode 1)
-#+end_src
 *** UI Elements
 Remove unnecessary UI elements: scroll-bar, tool-bar, menu-bar, tool-tips.
 #+BEGIN_SRC emacs-lisp
@@ -285,7 +339,6 @@ is the best modeline that I have tried thus far. I increase the ~vcs-max-length~
 due to extra long branch names that I often use.
 #+BEGIN_SRC emacs-lisp
   (use-package doom-modeline
-      :disabled t
       :demand t
       :hook (after-init . doom-modeline-mode)
       :init
@@ -295,11 +348,17 @@ due to extra long branch names that I often use.
       (doom-modeline-indent-info t))
 
   (use-package powerline
+    :disabled t
     :init
     (defpowerline powerline-minor-modes "")
     :config
     (powerline-default-theme))
 #+END_SRC
+**** Time in Modeline
+I like to have the time displayed in my modeline.
+#+begin_src emacs-lisp
+(display-time-mode 1)
+#+end_src
 
 *** Yes or no prompt
 I really don't like having to fully type out 'yes' and 'no' everytime.
@@ -315,7 +374,7 @@ icons in my completion buffer, startpage, etc.
 #+END_SRC
 
 *** Startpage
-Ideally I would have a custom start page. For now ~dashboard~ suits my purposes
+Ideally I would have a custom start page (org file). For now ~dashboard~ suits my purposes
 and doesn't seem overly resource heavy.
 #+BEGIN_SRC emacs-lisp
 (use-package page-break-lines)
