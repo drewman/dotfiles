@@ -148,6 +148,9 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
       (interactive)
       (find-file "~/.emacs.d/Drew.org"))
 
+  (defun my/open-worklog()
+      (interactive)
+      (find-file "~/org/notes/worklog.org"))
 #+END_SRC
 **** Define spacemacs-like keybinds.
 #+BEGIN_SRC emacs-lisp
@@ -173,6 +176,7 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
       "bw" 'kill-buffer-and-window
       "f" '(:ignore t :which-key "file")
       "ff" '(counsel-find-file :which-key "find file")
+      "fl" '(my/open-worklog :which-key "open worklog")
       "fi" '(imenu :which-key "jump in file")
       "fj" '(counsel-file-jump :which-key "jump to file")
       "fp" '(my/open-config :which-key "open personal config")
