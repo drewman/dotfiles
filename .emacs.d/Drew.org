@@ -45,12 +45,11 @@ Some optimizations to speed up start-up time.
 + Add the "melpa" source because all the good stuff is on MELPA.
 + Add the "org" source to get (more) recent org-mode builds than what is included with emacs.
 #+BEGIN_SRC emacs-lisp
-  (setq package-user-dir (expand-file-name "elpa" user-emacs-directory)
-        package-archives
-        '(("gnu"   . "https://elpa.gnu.org/packages/")
-          ("melpa" . "https://melpa.org/packages/")
-          ("org" . "https://orgmode.org/elpa/")
-          ))
+  (require 'package)
+  (setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
+
+  (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 #+END_SRC
 *** Configure package manager
 #+begin_src emacs-lisp
@@ -106,6 +105,16 @@ Add some add-ons (particularly =ox-confluence= because =org-plus-contrib= was br
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 #+end_src
 
+*** Org-mode
+Due to some buggy nonsense. Putting this up before anything else gets done to prevent any possible issues.
+#+begin_src emacs-lisp
+  ;; copied from org-mode website installation instruction
+  (unless package-archive-contents    ;; Refresh the packages descriptions
+    (package-refresh-contents))
+  (setq package-load-list '(all))     ;; List of packages to load
+  (unless (package-installed-p 'org)  ;; Make sure the Org package is
+    (package-install 'org))           ;; installed, install it if not
+  (package-initialize)                ;; Initialize & Install Package
 #+end_src
 
 ** Keybinds
