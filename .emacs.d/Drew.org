@@ -100,6 +100,14 @@ Use ~auto-package-update~ to automatically update packages every week.
     (auto-package-update-maybe))
 #+end_src
 
+*** Load Path
+Add some add-ons (particularly =ox-confluence= because =org-plus-contrib= was breaking =org-agenda=) via ~load-path~.
+#+begin_src emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+#+end_src
+
+#+end_src
+
 ** Keybinds
 *** Evil
 **** colon commands
