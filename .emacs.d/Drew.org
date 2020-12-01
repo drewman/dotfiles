@@ -700,7 +700,8 @@ Custom refiles with a helper function to rebuild targets. It would be nice to ha
   (defvar my/refile-targets (my/build-refile-targets))
 
   (defun my/rebuild-refile-targets ()
-        (setq my/refile-targets (my/build-refile-targets)))
+    (interactive)
+    (setq my/refile-targets (my/build-refile-targets)))
 
   ;;(defvar my/refile-targets
     ;; (mapcar 'abbreviate-file-name
@@ -738,14 +739,14 @@ Capture templates
 Configure org and associated packages.
 #+BEGIN_SRC emacs-lisp
   (use-package org
-      :ensure org-plus-contrib
       :custom
       (org-directory "~/org/")
       (org-babel-process-comment-text 'my/remove-properties)
-      (org-agenda-files '("~/org/notes/important_dates.org"))
-      (org-agenda-span 14)
+      (org-agenda-files (list "~/org/notes/important_dates.org" "~/org/notes/worklog.org"))
+      (org-agenda-window-setup 'current-window)
+      (org-agenda-span 10)
       (org-agenda-start-on-weekday nil)
-      (org-agenda-start-day "-3d")
+      (org-agenda-start-day "-2d")
       (org-refile-targets '((my/refile-targets :maxlevel . 1)))
       (org-link-file-path-type "absolute")
       (org-ellipsis " ▼ ")
@@ -779,7 +780,6 @@ Configure org and associated packages.
     (setq visual-fill-column-center-text t)
     :hook (org-mode . visual-fill-column-mode))
 #+END_SRC
-
 *** Deft
 #+BEGIN_SRC emacs-lisp
   (use-package deft
@@ -806,7 +806,9 @@ Configure org and associated packages.
   (use-package evil-org
     :after org
     :config
-    (add-hook 'org-mode-hook 'evil-org-mode))
+    (add-hook 'org-mode-hook 'evil-org-mode)
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys))
 #+end_src
 
 *** Keymaps
