@@ -305,9 +305,9 @@ I dislike both an audio and a visual ring-bell. So remove the ring-bell altogeth
 #+END_SRC
 
 *** Font
-Set the default display to use "JetBrains Mono" font with size 14.
+Set the default display to use "JetBrains Mono" font with size 15.
 #+BEGIN_SRC emacs-lisp
-(set-face-attribute 'default nil :family "JetBrains Mono" :height 120)
+(set-face-attribute 'default nil :family "JetBrains Mono" :height 150)
 #+END_SRC
 
 *** Theme
