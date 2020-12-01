@@ -1,5 +1,5 @@
 #+TITLE: Drew's Emacs Configuration
-+AUTHOR: Drew Bruce
+#+AUTHOR: Drew Bruce
 #+EMAIL: drew@drewbruce.com
 
 * About
@@ -137,14 +137,20 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
       (evil-escape-mode))
 #+END_SRC
 
-**** Global binds
+*** Global binds
+**** ~general.el~ makes managing keybinds extremely easy.
 #+BEGIN_SRC emacs-lisp
   (use-package general)
-
+#+END_SRC
+**** Define special functions to open specific files. Binding this to ~SPC f <>~
+#+BEGIN_SRC emacs-lisp
   (defun my/open-config()
       (interactive)
       (find-file "~/.emacs.d/Drew.org"))
 
+#+END_SRC
+**** Define spacemacs-like keybinds.
+#+BEGIN_SRC emacs-lisp
   (general-define-key
       :states '(normal visual insert emacs)
       :prefix "SPC"
@@ -224,13 +230,17 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
       "wj" 'evil-window-down
       "wk" 'evil-window-up
    )
-
+#+END_SRC
+**** Add a local leader as a placeholder for mode specific keybinds.
+#+BEGIN_SRC emacs-lisp
   (general-create-definer my/local-leader-def
     :states '(normal visual insert emacs)
     :prefix "SPC l"
     :non-normal-prefix "C-SPC l"
     "" '(:ignore t :which-key "local"))
-
+#+END_SRC
+**** Define some helpful non-leader keybinds
+#+BEGIN_SRC emacs-lisp
   (general-define-key
        :states 'visual
        "C-c c" 'comment-or-uncomment-region)
@@ -265,8 +275,7 @@ For that purpose, ~exec-path-from-shell~ is used so all programs will be run sim
 
 ** Look and Feel
 *** Line Numbers
-I like to always display line numbers.
-Display line numbers in prog mode.
+I like to always display line numbers when I'm programming.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 #+END_SRC
@@ -334,9 +343,8 @@ This might be a bit redundant with ~show-paren-mode~, but this helps me with con
 #+END_SRC
 
 *** Modeline
-The default modeline is, in my opinion, dated and ugly. ~doom-modeline~
-is the best modeline that I have tried thus far. I increase the ~vcs-max-length~
-due to extra long branch names that I often use.
+The default modeline is, in my opinion, dated and ugly. ~doom-modeline~ is the best modeline that I have tried thus far. I increase the ~vcs-max-length~ due to extra long branch names that I often use.
+Also, testing out Powerline. The big sell here is that the time doesn't hide when I lose focus on the window.
 #+BEGIN_SRC emacs-lisp
   (use-package doom-modeline
       :demand t
@@ -361,21 +369,19 @@ I like to have the time displayed in my modeline.
 #+end_src
 
 *** Yes or no prompt
-I really don't like having to fully type out 'yes' and 'no' everytime.
+Simpler yes/no prompts to save keystrokes.
 #+BEGIN_SRC emacs-lisp
 (defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
 *** Icons
-A lot of the addons that I'm using have support for ~all-the-icons~ to use fancy
-icons in my completion buffer, startpage, etc.
+A lot of the addons that I'm using have support for ~all-the-icons~ to use fancy icons in my completion buffer, startpage, etc. This makes the emacs experience feel more modern.
 #+BEGIN_SRC emacs-lisp
 (use-package all-the-icons)
 #+END_SRC
 
 *** Startpage
-Ideally I would have a custom start page (org file). For now ~dashboard~ suits my purposes
-and doesn't seem overly resource heavy.
+Ideally I would have a custom start page (org file). For now ~dashboard~ suits my purposes and doesn't seem overly resource heavy.
 #+BEGIN_SRC emacs-lisp
 (use-package page-break-lines)
 (use-package dashboard
@@ -587,7 +593,7 @@ Flycheck to show syntax issues
 #+END_SRC
 
 *** Source Control
-Magit is the default for git. One of the main reasons to use Emacs.
+Magit is an excellent porcelain for git. One of the main reasons to use Emacs.
 #+BEGIN_SRC emacs-lisp
 (use-package magit
     :defer t
@@ -617,6 +623,7 @@ Projectile is great for doing project related activities.
 #+END_SRC
 
 *** Python
+~anaconda-mode~ is extremely easy to setup and get working well. However, it isn't nearly as strong as some of the other Python modes out there. Would like to try something else when I have time.
 #+BEGIN_SRC emacs-lisp
   (use-package anaconda-mode
     :defer t
@@ -683,7 +690,7 @@ Custom function to strip properties out of comments during tangles.
   (defun my/remove-properties (str)
     (string-join (seq-filter (lambda (st) (not (string-prefix-p ":" st))) (split-string str "\n")) "\n"))
 #+END_SRC
-Custom refiles with a helper function to rebuild targets. It would be nice to have this hooked to automatically run during an initial save in org mode. Also, I would like to have 
+Custom refiles with a helper function to rebuild targets. It would be nice to have this hooked to automatically run during an initial save in org mode.
 #+BEGIN_SRC emacs-lisp
   (defun my/build-refile-targets ()
     (mapcar 'abbreviate-file-name
@@ -836,7 +843,7 @@ Configure org and associated packages.
    "C-c i" 'org-roam-insert
    "C-c I" 'org-roam-insert-immediate)
 #+END_SRC
-I don't like using the Meta key because of it's awkward placement on my keyboard. However, the control key is rebound to ~CAPS LOCK~, so it works beautifully. So, I'll just use that instead. There is an issue where I can't get ~general.el~ to make ~<C-return>~ behave like ~<M-return>~. This was the compromise that got it working.
+I don't like using the Meta key because of it's awkward placement on my keyboard. However, the control key is rebound to ~CAPS LOCK~ and it works beautifully. So, I'll just use that instead. There is an issue where I can't get ~general.el~ to make ~<C-return>~ behave like ~<M-return>~. This was the compromise that got it working.
 #+begin_src emacs-lisp :tangle yes
   (defun my/org-c-return ()
   "Custom function to bind to <C-return>"
@@ -848,6 +855,7 @@ I don't like using the Meta key because of it's awkward placement on my keyboard
     (kbd "<C-return>") 'my/org-c-return)
 #+end_src
 ** Snippets
+Love me some snippets to save keystrokes.
 #+begin_src emacs-lisp
   (use-package yasnippet
     :init
