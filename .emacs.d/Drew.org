@@ -763,11 +763,10 @@ Configure org and associated packages.
       :custom
       (org-directory "~/org/")
       (org-babel-process-comment-text 'my/remove-properties)
-      (org-agenda-files (list "~/org/notes/important_dates.org" "~/org/notes/worklog.org"))
+      (org-agenda-files (list "~/org/notes/important_dates.org" "~/org/notes/worklog.org" "~/org/notes/inbox.org"))
       (org-agenda-window-setup 'current-window)
       (org-agenda-span 10)
       (org-agenda-start-on-weekday nil)
-      (org-agenda-start-day "-2d")
       (org-refile-targets '((my/refile-targets :maxlevel . 1)))
       (org-link-file-path-type "absolute")
       (org-ellipsis " ▼ ")
