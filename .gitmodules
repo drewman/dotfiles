@@ -1,0 +1,3 @@
+[submodule "aweshell"]
+	path = .emacs.d/lisp/aweshell
+	url = git@github.com:manateelazycat/aweshell.git
