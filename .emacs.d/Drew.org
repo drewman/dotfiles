@@ -170,87 +170,99 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
       (find-file "~/org/notes/worklog.org"))
 #+END_SRC
 **** Define spacemacs-like keybinds.
+Defining these at the top of the file so if other regions crash the init, I still have keybinds.
 #+BEGIN_SRC emacs-lisp
   (general-define-key
-      :states '(normal visual insert emacs)
-      :prefix "SPC"
-      :non-normal-prefix "C-SPC"
-      "p" '(:keymap projectile-command-map :package projectile :which-key "projectile")
-      "x" '(counsel-M-x :which-key "M-x")
-      "." '(counsel-find-file :which-key "find file")
-      "'" 'ivy-resume
+        :states '(normal visual insert emacs)
+        :prefix "SPC"
+        :non-normal-prefix "C-SPC"
+        "p" '(:keymap projectile-command-map :package projectile :which-key "projectile")
+        "x" '(counsel-M-x :which-key "M-x")
+        "." '(counsel-find-file :which-key "find file")
+        "'" 'ivy-resume
 
-      "b" '(:ignore t :which-key "buffer/bookmark")
-      "bb" 'counsel-switch-buffer
-      "bc" 'kill-current-buffer
-      "bd" 'counsel-bookmarked-directory
-      "bD" 'bookmark-delete
-      "be" 'eval-buffer
-      "bk" 'kill-buffer
-      "bl" '(evil-switch-to-windows-last-buffer :which-key "last buffer")
-      "bm" 'counsel-bookmark
-      "bu" 'bookmark-bmenu-list
-      "bw" 'kill-buffer-and-window
-      "f" '(:ignore t :which-key "file")
-      "ff" '(counsel-find-file :which-key "find file")
-      "fl" '(my/open-worklog :which-key "open worklog")
-      "fi" '(imenu :which-key "jump in file")
-      "fj" '(counsel-file-jump :which-key "jump to file")
-      "fp" '(my/open-config :which-key "open personal config")
-      "fs" 'save-buffer
-      "fu" 'undo-tree-visualize
-      "fM" 'mkdir
-      "fN" 'create-empty-file
+        "b" '(:ignore t :which-key "buffer/bookmark")
+        "bb" 'counsel-switch-buffer
+        "bc" 'kill-current-buffer
+        "bd" 'counsel-bookmarked-directory
+        "bD" 'bookmark-delete
+        "be" 'eval-buffer
+        "bi" 'avy-goto-line
+        "bj" 'avy-goto-char-timer
+        "bk" 'kill-buffer
+        "bl" '(evil-switch-to-windows-last-buffer :which-key "last buffer")
+        "bm" 'counsel-bookmark
+        "bu" 'bookmark-bmenu-list
+        "bw" 'kill-buffer-and-window
 
-      "g" '(:ignore t :which-key "magit")
-      "gb" 'magit-branch-and-checkout
-      "gc" 'magit-clone
-      "gd" 'magit-diff-working-tree
-      "gg" 'magit-status
-      "gi" 'magit-init
-      "gl" 'magit-log-current
+        "f" '(:ignore t :which-key "file")
+        "ff" '(counsel-find-file :which-key "find file")
+        "fl" '(my/open-worklog :which-key "open worklog")
+        "fi" '(imenu :which-key "jump in file")
+        "fj" '(counsel-file-jump :which-key "jump to file")
+        "fp" '(my/open-config :which-key "open personal config")
+        "fs" 'save-buffer
+        "fu" 'undo-tree-visualize
+        "fM" 'mkdir
+        "fN" 'create-empty-file
 
-      "h" '(:ignore t :which-key "help")
-      "ha" 'counsel-describe-face
-      "hb" 'describe-bindings
-      "hc" '(helpful-command :which-key "describe commands")
-      "hf" '(helpful-function :which-key "describe function")
-      "hG" 'customize-group
-      "hh" 'info-emacs-manual
-      "hk" '(helpful-key :which-key "describe key")
-      "hl" '(counsel-find-library :which-key "find library")
-      "hm" 'describe-mode
-      "ho" '(helpful-macro :which-key "describe macro")
-      "hp" '(helpful-at-point :which-key "describe at point")
-      "hs" '(counsel-describe-symbol :which-key "describe symbol")
-      "hv" '(counsel-describe-variable :which-key "describe variable")
-      "hV" '(counsel-set-variable :which-key "set variable")
+        "g" '(:ignore t :which-key "magit")
+        "gb" 'magit-branch-and-checkout
+        "gc" 'magit-clone
+        "gd" 'magit-diff-working-tree
+        "gg" 'magit-status
+        "gi" 'magit-init
+        "gl" 'magit-log-current
 
-      "o" '(:ignore t :which-key "org")
-      "oa" 'org-agenda
-      "oo" '(org-roam-capture :which-key "org capture")
-      "or" 'org-roam
-      "os" '(deft :which-key "search org files")
+        "h" '(:ignore t :which-key "help")
+        "ha" 'counsel-describe-face
+        "hb" 'describe-bindings
+        "hc" '(helpful-command :which-key "describe commands")
+        "hf" '(helpful-function :which-key "describe function")
+        "hG" 'customize-group
+        "hh" 'info-emacs-manual
+        "hk" '(helpful-key :which-key "describe key")
+        "hl" '(counsel-find-library :which-key "find library")
+        "hm" 'describe-mode
+        "ho" '(helpful-macro :which-key "describe macro")
+        "hp" '(helpful-at-point :which-key "describe at point")
+        "hs" '(counsel-describe-symbol :which-key "describe symbol")
+        "hv" '(counsel-describe-variable :which-key "describe variable")
+        "hV" '(counsel-set-variable :which-key "set variable")
+        "hw" '(woman :which-key "unix man files")
 
-      "t" '(:ignore t :which-key "tabs")
-      "tj" 'tab-bar-switch-to-next-tab
-      "tk" 'tab-bar-switch-to-prev-tab
-      "tq" 'tab-bar-close-tab
-      "tt" 'tab-bar-new-tab
+        "o" '(:ignore t :which-key "org")
+        "oa" 'org-agenda
+        "oo" '(org-roam-capture :which-key "org capture")
+        "or" 'org-roam
+        "os" '(deft :which-key "search org files")
 
-      "w" '(:ignore t :which-key "window")
-      "wb" 'balance-windows
-      "wd" 'delete-other-windows
-      "wn" 'evil-window-new
-      "wo" 'other-window
-      "wq" 'evil-quit
-      "ws" 'evil-window-split
-      "wv" 'evil-window-vsplit
-      "wh" 'evil-window-left
-      "wl" 'evil-window-right
-      "wj" 'evil-window-down
-      "wk" 'evil-window-up
-   )
+        "s" '(:ignore t :which-key "shell")
+        "se" '(aweshell-new :which-key "new eshell buffer")
+        "sI" '(my/insert-shell-command :which-key "insert shell cmd in buffer")
+        "sr" '(my/open-remote-shell :which-key "open remote shell")
+        "ss" '(shell :which-key "vanilla shell")
+        "st" '(aweshell-dedicated-toggle :which-key "toggle eshell popup")
+
+        "t" '(:ignore t :which-key "tabs")
+        "tj" 'tab-bar-switch-to-next-tab
+        "tk" 'tab-bar-switch-to-prev-tab
+        "tq" 'tab-bar-close-tab
+        "tt" 'tab-bar-new-tab
+
+        "w" '(:ignore t :which-key "window")
+        "wb" 'balance-windows
+        "wd" 'delete-other-windows
+        "wn" 'evil-window-new
+        "wo" 'other-window
+        "wq" 'evil-quit
+        "ws" 'evil-window-split
+        "wv" 'evil-window-vsplit
+        "wh" 'evil-window-left
+        "wl" 'evil-window-right
+        "wj" 'evil-window-down
+        "wk" 'evil-window-up
+     )
 #+END_SRC
 **** Add a local leader as a placeholder for mode specific keybinds.
 #+BEGIN_SRC emacs-lisp
@@ -278,6 +290,8 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
   (general-define-key
    :states 'insert
    :keymaps '(org-mode-map prog-mode-map)
+   [tab] 'mz/smarter-tab-to-complete
+   "TAB" 'mz/smarter-tab-to-complete
    "C-n" 'next-line
    "C-p" 'previous-line
    "C-e" 'end-of-line
