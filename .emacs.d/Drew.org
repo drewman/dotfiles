@@ -644,6 +644,23 @@ Projectile is great for doing project related activities.
 #+END_SRC
 
 *** Python
+**** Python-mode
+#+begin_src emacs-lisp
+  (setq python-shell-interpreter "ipython"
+        python-shell-interpreter-args "-i --simple-prompt")
+#+end_src
+
+Function pulled from [[https://dougie.io/emacs/django-shell/][dougie.io]] blog.
+#+begin_src emacs-lisp
+  (defun django-shell ()
+    (interactive)
+    (let ((python-shell-interpreter (read-file-name "Locate manage.py "))
+          (python-shell-interpreter-args "shell_plus"))
+      (run-python (python-shell-calculate-command) nil t)))
+#+end_src
+
+
+**** Anaconda
 ~anaconda-mode~ is extremely easy to setup and get working well. However, it isn't nearly as strong as some of the other Python modes out there. Would like to try something else when I have time.
 #+BEGIN_SRC emacs-lisp
   (use-package anaconda-mode
