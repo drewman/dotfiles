@@ -704,6 +704,26 @@ Projectile is great for doing project related activities.
     (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode)))
 #+END_SRC
 
+** Shell
+#+begin_src emacs-lisp
+  (defun my/insert-shell-command (CMD)
+    (interactive "s")
+    (insert (shell-command-to-string CMD)))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package aweshell
+    :load-path (lambda () (expand-file-name "lisp/aweshell" user-emacs-directory)))
+#+end_src
+
+#+begin_src emacs-lisp
+  (defun my/open-remote-shell (host)
+    (interactive "s<user>@<host>: ")
+    (let ((default-directory (concat "/ssh:" host ":~")))
+          (shell)))
+#+end_src
+
+
 ** Org
 *** Setup
 Custom function to strip properties out of comments during tangles.
