@@ -657,6 +657,14 @@ Projectile is great for doing project related activities.
     :config
     (add-to-list 'company-backends 'company-anaconda))
 #+END_SRC
+**** Pyenv
+#+begin_src emacs-lisp
+  (use-package pyenv-mode
+    :custom
+    (python-shell-virtualenv-path "~/.pyenv/versions")
+    :hook
+    (python-mode . pyenv-mode))
+#+end_src
 
 *** Haskell
 #+BEGIN_SRC emacs-lisp
