@@ -558,40 +558,46 @@ Prefer a scratch message that reminds me of the keybinds I always forget.
 
 ** Development
 *** Completion
-Company is the default. Everything supports it and it works well. Pulled from [[https://github.com/MatthewZMD/.emacs.d][Matthew Zeng's config]].
+Company is the default. Everything supports it and it works well. Pulled from [[https://github.com/MatthewZMD/.emacs.d][Matthew Zeng's config]] and tweaked a bit. I really like company to only start once I ask for it and tabs to cycle through the options. 
 #+BEGIN_SRC emacs-lisp
     ;; SECTION -- DEV
   (use-package company
-      :hook (after-init . global-company-mode)
+      :hook (prog-mode . company-mode)
+      :hook (org-mode . company-mode)
       :bind
       (:map company-active-map
-            ([tab] . mz/smarter-tab-to-complete)
-            ("TAB" . mz/smarter-tab-to-complete)
+            ([tab] . company-complete-common-or-cycle)
+            ("TAB" . company-complete-common-or-cycle)
+            ([backtab] . company-select-previous)
+            ("BACKTAB" . company-select-previous)
             ("C-n" . company-select-next)
             ("C-p" . company-select-previous))
       :custom
+      (company-global-modes '(not shell-mode eshell-mode))
       (company-minimum-prefix-length 1)
       (company-tooltip-align-annotations t)
-      (company-require-match 'never)
-      (company-idle-delay 0.1)
+      (company-require-match "never")
+      (company-idle-delay nil)
       (company-show-numbers t)
-      :config
-      (defun mz/smarter-tab-to-complete ()
-      "Try to `org-cycle', `yas-expand', and `yas-next-field' at current cursor position.
-  If all failed, try to complete the common part with `company-complete-common'"
-      (interactive)
-      (if yas-minor-mode
-          (let ((old-point (point))
-                (old-tick (buffer-chars-modified-tick))
-                (func-list '(org-cycle yas-expand yas-next-field)))
-            (catch 'func-suceed
-              (dolist (func func-list)
-                (ignore-errors (call-interactively func))
-                (unless (and (eq old-point (point))
-                             (eq old-tick (buffer-chars-modified-tick)))
-                  (throw 'func-suceed t)))
-              (company-complete-common))))))
-
+      (global-company-mode 1))
+#+END_SRC
+      
+#+BEGIN_SRC emacs-lisp
+  (defun mz/smarter-tab-to-complete ()
+  "Try to `org-cycle', `yas-expand', and `yas-next-field' at current cursor position.
+If all failed, try to complete the common part with `company-complete-common'"
+  (interactive)
+  (if yas-minor-mode
+      (let ((old-point (point))
+            (old-tick (buffer-chars-modified-tick))
+            (func-list '(org-cycle yas-expand yas-next-field)))
+        (catch 'func-suceed
+          (dolist (func func-list)
+            (ignore-errors (call-interactively func))
+            (unless (and (eq old-point (point))
+                         (eq old-tick (buffer-chars-modified-tick)))
+              (throw 'func-suceed t)))
+          (company-complete-common)))))
 #+END_SRC
 **** Company TabNine
      Add TabNine completion to Company.
