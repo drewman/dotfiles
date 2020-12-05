@@ -367,21 +367,38 @@ This might be a bit redundant with ~show-paren-mode~, but this helps me with con
 The default modeline is, in my opinion, dated and ugly. ~doom-modeline~ is the best modeline that I have tried thus far. I increase the ~vcs-max-length~ due to extra long branch names that I often use.
 Also, testing out Powerline. The big sell here is that the time doesn't hide when I lose focus on the window.
 #+BEGIN_SRC emacs-lisp
-  (use-package doom-modeline
-      :demand t
-      :hook (after-init . doom-modeline-mode)
-      :init
-      (display-time-mode 1)
-      :custom
-      (doom-modeline-vcs-max-length 40)
-      (doom-modeline-indent-info t))
+  ;; (use-package doom-modeline
+  ;;     :disabled t
+  ;;     :demand t
+  ;;     :hook (after-init . doom-modeline-mode)
+  ;;     :init
+  ;;     (display-time-mode 1)
+  ;;     :custom
+  ;;     (doom-modeline-vcs-max-length 40)
+  ;;     (doom-modeline-indent-info t))
 
   (use-package powerline
-    :disabled t
     :init
     (defpowerline powerline-minor-modes "")
     :config
+    (display-time-mode)
     (powerline-default-theme))
+
+  ;; (use-package telephone-line
+  ;;   :init
+  ;;   (setq telephone-line-lhs
+  ;;         '((evil   . (telephone-line-evil-tag-segment))
+  ;;           (accent . (telephone-line-vc-segment))
+  ;;           (nil    . (telephone-line-projectile-segment
+  ;;                      telephone-line-buffer-name-segment
+  ;;                      telephone-line-buffer-modified-segment))))
+  ;;   (setq telephone-line-rhs
+  ;;         '((nil    . (telephone-line-misc-info-segment))
+  ;;           (accent . (telephone-line-simple-major-mode-segment))
+  ;;           (evil   . (telephone-line-hud-segment))))
+  ;;   :config
+  ;;   (display-time-mode 1)
+  ;;   (telephone-line-mode t))
 #+END_SRC
 **** Time in Modeline
 I like to have the time displayed in my modeline.
