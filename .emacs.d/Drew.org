@@ -456,6 +456,16 @@ I dislike the default for prepending numbers to buffers with the same name. This
 #+BEGIN_SRC emacs-lisp
   (global-visual-line-mode)
 #+END_SRC
+** Editing
+*** Undo-Tree
+#+begin_src emacs-lisp
+  (use-package undo-tree
+    :custom
+    (undo-tree-visualizer-diff t)
+    (undo-tree-visualizer-timestamps t)
+    :config
+    (global-undo-tree-mode))
+#+end_src
 *** Code Folding
 Turn on basic code folding. To enable ~zo~ and ~zc~ evil keybinds.
 #+BEGIN_SRC emacs-lisp
