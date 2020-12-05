@@ -475,7 +475,25 @@ Turn on basic code folding. To enable ~zo~ and ~zc~ evil keybinds.
 *** Line highlighting
 #+begin_src emacs-lisp :tangle yes
   (global-hl-line-mode)
+*** Avy
+Package that let's me jump around to a specific point of text.
+#+begin_src emacs-lisp
+  (use-package avy)
 #+end_src
+*** evil-matchit
+#+begin_src emacs-lisp
+  (use-package evil-matchit
+    :config
+    (global-evil-matchit-mode 1))
+#+end_src
+
+*** evil-surround 
+#+begin_src emacs-lisp
+  (use-package evil-surround
+    :config
+    (global-evil-surround-mode 1))
+#+end_src
+
 ** Completion
 *** Framework 
 Currently using Ivy. I've found that it works the best with the least amount of configuration to the other frameworks I've tried. Prost uses icomplete, which would be interesting to try, however it requires a lot of configuration to get correct. I've never really given helm a try because it seems so heavy. However, it also has some really nice functionality.
