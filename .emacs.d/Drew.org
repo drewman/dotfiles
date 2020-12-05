@@ -535,6 +535,8 @@ Currently using Ivy. I've found that it works the best with the least amount of 
   (use-package counsel)
 
   (use-package ivy
+      :init
+      (use-package amx :defer t)
       :custom
       (ivy-count-format " (%d/%d) ")
       (setq ivy-re-builders-alist
