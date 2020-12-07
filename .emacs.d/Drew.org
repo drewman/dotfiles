@@ -296,6 +296,13 @@ Defining these at the top of the file so if other regions crash the init, I stil
    "C-e" 'end-of-line
    "C-a" 'beginning-of-line-next)
 #+END_SRC
+*** Evil Collection
+#+begin_src emacs-lisp
+  (use-package evil-collection
+    :config
+    (evil-collection-init))
+#+end_src
+
 
 ** env
 When running code from within Emacs, ideally it will run exactly the same as if it were run in terminal.
