@@ -387,15 +387,14 @@ This might be a bit redundant with ~show-paren-mode~, but this helps me with con
 The default modeline is, in my opinion, dated and ugly. ~doom-modeline~ is the best modeline that I have tried thus far. I increase the ~vcs-max-length~ due to extra long branch names that I often use.
 Also, testing out Powerline. The big sell here is that the time doesn't hide when I lose focus on the window.
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package doom-modeline
-  ;;     :disabled t
-  ;;     :demand t
-  ;;     :hook (after-init . doom-modeline-mode)
-  ;;     :init
-  ;;     (display-time-mode 1)
-  ;;     :custom
-  ;;     (doom-modeline-vcs-max-length 40)
-  ;;     (doom-modeline-indent-info t))
+  (use-package doom-modeline
+      :disabled t
+      :hook (after-init . doom-modeline-mode)
+      :init
+      (display-time-mode 1)
+      :custom
+      (doom-modeline-vcs-max-length 40)
+      (doom-modeline-indent-info t))
 
   (use-package powerline
     :init
@@ -889,6 +888,11 @@ Configure org and associated packages.
       (org-hide-emphasis-markers t)
       (org-M-RET-may-split-line '((item . nil)))
       (org-insert-heading-respect-content t)
+      (org-lowest-priority ?D)
+      (org-priority-faces '((?A . (:foreground "red" :weight bold))
+                            (?B . (:foreground "orange"))
+                            (?C . (:foreground "yellow"))
+                            (?D . (:foreground "green"))))
       :config
       (require 'ox-confluence)
       (add-hook 'org-mode-hook 'org-indent-mode)
@@ -910,12 +914,26 @@ Configure org and associated packages.
     :config
     (add-hook 'org-mode-hook (lambda() (org-superstar-mode 1))))
 
+  (use-package org-fancy-priorities
+    :hook
+    (org-mode . org-fancy-priorities-mode)
+    :config
+    (setq org-fancy-priorities-list '("HIGH" "MEDIUM" "LOW" "OPTIONAL")))
+
   (use-package visual-fill-column
     :init
     (setq visual-fill-column-width 120)
     (setq visual-fill-column-center-text t)
     :hook (org-mode . visual-fill-column-mode))
 #+END_SRC
+*** Custom Functions
+Insert Jira ticket links with ease.
+#+begin_src emacs-lisp
+  (defun my/insert-nike-jira-link (ticket-number)
+    (interactive "sTicket Number: ")
+    (insert "[[https://jira.nike.com/browse/" ticket-number "][" ticket-number "]]"))
+#+end_src
+
 *** Deft
 #+BEGIN_SRC emacs-lisp
   (use-package deft
