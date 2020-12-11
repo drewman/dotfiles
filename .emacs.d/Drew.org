@@ -135,6 +135,9 @@ I prefer to have :q commands just close the window and not Emacs. Only ~:quit~ s
       (kill-buffer)))
 
   (use-package evil
+      :custom
+      (evil-want-C-u-scroll t)
+      (evil-disable-insert-state-bindings t)
       :config
       (evil-ex-define-cmd "q" 'my/evil-close)
       (evil-ex-define-cmd "wq" 'my/evil-save-and-close)
