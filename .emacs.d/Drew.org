@@ -174,14 +174,11 @@ Allow 'jk' to substitute for escape in normal mode if pressed quickly enough.
 **** Define spacemacs-like keybinds.
 Defining these at the top of the file so if other regions crash the init, I still have keybinds.
 #+BEGIN_SRC emacs-lisp
+  (define-key evil-normal-state-map (kbd "SPC") (general-simulate-key "C-c"))
   (general-define-key
         :states '(normal visual insert emacs)
-        :prefix "SPC"
-        :non-normal-prefix "C-SPC"
-        "p" '(:keymap projectile-command-map :package projectile :which-key "projectile")
+        :prefix "C-c"
         "x" '(counsel-M-x :which-key "M-x")
-        "." '(counsel-find-file :which-key "find file")
-        "'" 'ivy-resume
 
         "b" '(:ignore t :which-key "buffer/bookmark")
         "bb" 'counsel-switch-buffer
@@ -216,28 +213,15 @@ Defining these at the top of the file so if other regions crash the init, I stil
         "gi" 'magit-init
         "gl" 'magit-log-current
 
-        "h" '(:ignore t :which-key "help")
-        "ha" 'counsel-describe-face
-        "hb" 'describe-bindings
-        "hc" '(helpful-command :which-key "describe commands")
-        "hf" '(helpful-function :which-key "describe function")
-        "hG" 'customize-group
-        "hh" 'info-emacs-manual
-        "hk" '(helpful-key :which-key "describe key")
-        "hl" '(counsel-find-library :which-key "find library")
-        "hm" 'describe-mode
-        "ho" '(helpful-macro :which-key "describe macro")
-        "hp" '(helpful-at-point :which-key "describe at point")
-        "hs" '(counsel-describe-symbol :which-key "describe symbol")
-        "hv" '(counsel-describe-variable :which-key "describe variable")
-        "hV" '(counsel-set-variable :which-key "set variable")
-        "hw" '(woman :which-key "unix man files")
+        "h" '(:keymap help-map :which-key "help")
 
         "o" '(:ignore t :which-key "org")
         "oa" 'org-agenda
         "oo" '(org-roam-capture :which-key "org capture")
         "or" 'org-roam
         "os" '(deft :which-key "search org files")
+
+        "p" '(:keymap projectile-command-map :package projectile :which-key "projectile")
 
         "s" '(:ignore t :which-key "shell")
         "se" '(aweshell-new :which-key "new eshell buffer")
@@ -252,26 +236,14 @@ Defining these at the top of the file so if other regions crash the init, I stil
         "tq" 'tab-bar-close-tab
         "tt" 'tab-bar-new-tab
 
-        "w" '(:ignore t :which-key "window")
-        "wb" 'balance-windows
-        "wd" 'delete-other-windows
-        "wn" 'evil-window-new
-        "wo" 'other-window
-        "wq" 'evil-quit
-        "ws" 'evil-window-split
-        "wv" 'evil-window-vsplit
-        "wh" 'evil-window-left
-        "wl" 'evil-window-right
-        "wj" 'evil-window-down
-        "wk" 'evil-window-up
-     )
+        "w" '(:keymap evil-window-map :which-key "window"))
 #+END_SRC
+
 **** Add a local leader as a placeholder for mode specific keybinds.
 #+BEGIN_SRC emacs-lisp
   (general-create-definer my/local-leader-def
     :states '(normal visual insert emacs)
-    :prefix "SPC l"
-    :non-normal-prefix "C-SPC l"
+    :prefix "C-c l"
     "" '(:ignore t :which-key "local"))
 #+END_SRC
 **** Define some helpful non-leader keybinds
@@ -288,7 +260,12 @@ Defining these at the top of the file so if other regions crash the init, I stil
   (general-define-key
        :states '(normal motion)
        "/" 'swiper-isearch)
-
+  (general-define-key
+   :keymaps 'evil-window-map
+   "d" 'delete-other-windows
+   "n" 'evil-window-new
+   "o" 'other-window)
+   
   (general-define-key
    :states 'insert
    :keymaps '(org-mode-map prog-mode-map)
@@ -611,9 +588,17 @@ Improved help menus with ~helpful~
 #+BEGIN_SRC emacs-lisp
   (use-package helpful
       :defer t
-     :custom
+      :custom
       (counsel-describe-function-function #'helpful-callable)
       (counsel-describe-variable-function #'helpful-variable))
+  (general-define-key
+      :prefix "C-h"
+      "f" 'helpful-callable
+      "v" 'helpful-variable
+      "k" 'helpful-key
+      "F" 'helpful-function
+      "C" 'helpful-command
+      "h" 'helpful-at-point)
   (general-def helpful-mode-map
        :states '(normal motion emacs)
        "q" 'quit-window)
