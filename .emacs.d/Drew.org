@@ -934,12 +934,14 @@ Insert Jira ticket links with ease.
     (insert "[[https://jira.nike.com/browse/" ticket-number "][" ticket-number "]]"))
 #+end_src
 
-Open link with eww
+Mimics the behavior of calling eww but works with org links. If over link, open with eww, otherwise just call eww for search prompt.
 #+begin_src emacs-lisp
   (defun my/org-open-link-at-point-with-eww ()
     (interactive)
     (let ((browse-url-browser-function 'eww-browse-url))
-      (org-open-at-point)))
+      (condition-case nil
+          (org-open-at-point-global)
+        ((user-error "No link found") (call-interactively 'eww)))))
 #+end_src
 *** Deft
 #+BEGIN_SRC emacs-lisp
@@ -989,6 +991,10 @@ Open link with eww
       "D" 'org-babel-demarcate-block
       "I" 'org-roam-insert-immediate
       "T" 'org-babel-tangle)
+
+  (general-define-key
+   :keymaps 'org-mode-map
+   "C-c e" '(my/org-open-link-at-point-with-eww :which-key "eww"))
 
   (general-define-key
    :keymaps 'org-mode-map
