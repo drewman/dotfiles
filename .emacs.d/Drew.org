@@ -180,6 +180,8 @@ Defining these at the top of the file so if other regions crash the init, I stil
         :prefix "C-c"
         "x" '(counsel-M-x :which-key "M-x")
 
+        "a" 'avy-goto-char-timer
+
         "b" '(:ignore t :which-key "buffer/bookmark")
         "bb" 'counsel-switch-buffer
         "bc" 'kill-current-buffer
@@ -193,6 +195,8 @@ Defining these at the top of the file so if other regions crash the init, I stil
         "bm" 'counsel-bookmark
         "bu" 'bookmark-bmenu-list
         "bw" 'kill-buffer-and-window
+
+        "e" 'eww
 
         "f" '(:ignore t :which-key "file")
         "ff" '(counsel-find-file :which-key "find file")
@@ -214,6 +218,9 @@ Defining these at the top of the file so if other regions crash the init, I stil
         "gl" 'magit-log-current
 
         "h" '(:keymap help-map :which-key "help")
+
+        "l" 'avy-goto-line
+        "i" 'imenu
 
         "o" '(:ignore t :which-key "org")
         "oa" 'org-agenda
@@ -237,13 +244,14 @@ Defining these at the top of the file so if other regions crash the init, I stil
         "tt" 'tab-bar-new-tab
 
         "w" '(:keymap evil-window-map :which-key "window"))
+        "z" 'undo-tree-visualize
 #+END_SRC
 
 **** Add a local leader as a placeholder for mode specific keybinds.
 #+BEGIN_SRC emacs-lisp
   (general-create-definer my/local-leader-def
     :states '(normal visual insert emacs)
-    :prefix "C-c l"
+    :prefix "C-c m"
     "" '(:ignore t :which-key "local"))
 #+END_SRC
 **** Define some helpful non-leader keybinds
@@ -525,6 +533,7 @@ Currently using Ivy. I've found that it works the best with the least amount of 
       (use-package amx :defer t)
       :custom
       (ivy-count-format " (%d/%d) ")
+      (ivy-wrap t)
       (setq ivy-re-builders-alist
             '((t . ivy--regex-ignore-order)))
       :bind (:map ivy-minibuffer-map
@@ -594,6 +603,7 @@ Improved help menus with ~helpful~
   (general-define-key
       :prefix "C-h"
       "f" 'helpful-callable
+      "G" 'customize-group
       "v" 'helpful-variable
       "k" 'helpful-key
       "F" 'helpful-function
@@ -622,6 +632,8 @@ Company is the default. Everything supports it and it works well. Pulled from [[
       (:map company-active-map
             ([tab] . company-complete-common-or-cycle)
             ("TAB" . company-complete-common-or-cycle)
+            ([ret] . company-complete)
+            ("RET" . company-complete)
             ([backtab] . company-select-previous)
             ("BACKTAB" . company-select-previous)
             ("C-n" . company-select-next)
@@ -997,6 +1009,175 @@ I don't like using the Meta key because of it's awkward placement on my keyboard
   (evil-define-key '(normal insert) 'evil-org-mode
     (kbd "<C-return>") 'my/org-c-return)
 #+end_src
+
+** Gnus
+*** Config
+#+begin_src emacs-lisp
+  (use-package gnus
+    :config
+    (setq gnus-select-method '(nntp "news.gwene.org")))
+#+end_src
+
+** Elfeed
+Elfeed works so much better in doom. Copying the setup.
+*** Helper functions
+#+begin_src emacs-lisp
+  (defun doom/rss-delete-pane ()
+    "Delete the *elfeed-entry* split pane."
+    (interactive)
+    (let* ((buf (get-buffer "*elfeed-entry*"))
+           (window (get-buffer-window buf)))
+      (delete-window window)
+      (when (buffer-live-p buf)
+        (kill-buffer buf))))
+
+  (defun doom/rss-open (entry)
+    "Display the currently selected item in a buffer."
+    (interactive (list (elfeed-search-selected :ignore-region)))
+    (when (elfeed-entry-p entry)
+      (elfeed-untag entry 'unread)
+      (elfeed-search-update-entry entry)
+      (elfeed-show-entry entry)))
+
+  (defun doom/rss-next ()
+    "Show the next item in the elfeed-search buffer."
+    (interactive)
+    (funcall elfeed-show-entry-delete)
+    (with-current-buffer (elfeed-search-buffer)
+      (forward-line)
+      (call-interactively 'doom/rss-open)))
+
+  (defun doom/rss-previous ()
+    "Show the previous item in the elfeed-search buffer."
+    (interactive)
+    (funcall elfeed-show-entry-delete)
+    (with-current-buffer (elfeed-search-buffer)
+      (forward-line -1)
+      (call-interactively 'doom/rss-open)))
+
+  ;;
+  ;; Hooks
+
+  (defun doom/rss-elfeed-wrap-h ()
+    "Enhances an elfeed entry's readability by wrapping it to a width of
+  `fill-column'."
+    (let ((inhibit-read-only t)
+          (inhibit-modification-hooks t))
+      (setq-local truncate-lines nil)
+      (setq-local shr-use-fonts nil)
+      (setq-local shr-width 85)
+      (set-buffer-modified-p nil)))
+
+  (defun doom/rss-cleanup-h ()
+    "Clean up after an elfeed session. Kills all elfeed and elfeed-org files."
+    (interactive)
+    ;; `delete-file-projectile-remove-from-cache' slows down `elfeed-db-compact'
+    ;; tremendously, so we disable the projectile cache:
+    (let (projectile-enable-caching)
+      (elfeed-db-compact))
+    (let ((buf (previous-buffer)))
+      (when (or (null buf) (not (doom-real-buffer-p buf)))
+        (switch-to-buffer (doom-fallback-buffer))))
+    (let ((search-buffers (doom-buffers-in-mode 'elfeed-search-mode))
+          (show-buffers (doom-buffers-in-mode 'elfeed-show-mode))
+          kill-buffer-query-functions)
+      (dolist (file (bound-and-true-p rmh-elfeed-org-files))
+        (when-let (buf (get-file-buffer (expand-file-name file org-directory)))
+          (kill-buffer buf)))
+      (dolist (b search-buffers)
+        (with-current-buffer b
+          (remove-hook 'kill-buffer-hook #'doom/rss-cleanup-h :local)
+          (kill-buffer b)))
+      (mapc #'kill-buffer show-buffers)))
+
+  ;;
+  ;; Functions
+
+  (defun doom/rss-dead-feeds (&optional years)
+    "Return a list of feeds that haven't posted anything in YEARS."
+    (let* ((years (or years 1.0))
+           (living-feeds (make-hash-table :test 'equal))
+           (seconds (* years 365.0 24 60 60))
+           (threshold (- (float-time) seconds)))
+      (with-elfeed-db-visit (entry feed)
+        (let ((date (elfeed-entry-date entry)))
+          (when (> date threshold)
+            (setf (gethash (elfeed-feed-url feed) living-feeds) t))))
+      (cl-loop for url in (elfeed-feed-list)
+               unless (gethash url living-feeds)
+               collect url)))
+
+  (defun doom/rss-put-sliced-image-fn (spec alt &optional flags)
+    "TODO"
+    (letf! (defun insert-image (image &optional alt _area _slice)
+             (let ((height (cdr (image-size image t))))
+               (insert-sliced-image image alt nil (max 1 (/ height 20.0)) 1)))
+      (shr-put-image spec alt flags)))
+
+  (defun doom/rss-render-image-tag-without-underline-fn (dom &optional url)
+    "TODO"
+    (let ((start (point)))
+      (shr-tag-img dom url)
+      ;; And remove underlines in case images are links, otherwise we get an
+      ;; underline beneath every slice.
+      (put-text-property start (point) 'face '(:underline nil))))
+#+end_src
+
+*** Config
+#+begin_src emacs-lisp
+  (use-package elfeed
+    :init
+    (setq elfeed-db-directory (concat user-emacs-directory "elfeed/db/")
+          elfeed-enclosure-default-dir (concat user-emacs-directory "elfeed/enclosures/"))
+    :config
+    (setq elfeed-search-filter "@2-week-ago "
+          elfeed-show-entry-switch #'pop-to-buffer
+          elfeed-show-entry-delete #'doom/rss-delete-pane
+          shr-max-image-proportion 0.8)
+
+    (make-directory elfeed-db-directory t)
+
+    ;; Enhance readability of a post
+    (add-hook 'elfeed-show-mode-hook #'doom/rss-elfeed-wrap-h)
+    (add-hook 'elfeed-search-mode-hook
+      (add-hook 'kill-buffer-hook #'doom/rss-cleanup-h nil 'local))
+
+    ;; Large images are annoying to scroll through, because scrolling follows the
+    ;; cursor, so we force shr to insert images in slices.
+    (add-hook 'elfeed-show-mode-hook
+              (setq shr-put-image-function 'doom/rss-put-sliced-image-fn
+                    shr-external-rendering-functions '((img . doom/rss-render-image-tag-without-underline-fn)))))
+
+
+  (use-package elfeed-org
+    :after elfeed
+    :custom
+    (rmh-elfeed-org-files (list "~/org/elfeed.org"))
+    :config
+    (elfeed-org))
+  (use-package elfeed-goodies
+    :after elfeed
+    :config
+    (elfeed-goodies/setup))
+  (use-package elfeed-dashboard
+    :after elfeed
+    :load-path (lambda () (expand-file-name "lisp/elfeed-dashboard" user-emacs-directory))
+    :config
+    (progn
+      (setq elfeed-dashboard-file "~/org/elfeed-dashboard.org")
+      ;; to update feed counts automatically
+      (advice-add 'elfeed-search-quit-window :after #'elfeed-dashboard-update-links)))
+#+end_src
+
+*** Keybinds
+#+begin_src emacs-lisp
+  (general-def elfeed-search-mode-map
+     :states 'normal
+     "q" 'elfeed-kill-buffer
+     "r" 'elfeed-search-update--force)
+#+end_src
+
+
 ** Snippets
 Love me some snippets to save keystrokes.
 #+begin_src emacs-lisp
