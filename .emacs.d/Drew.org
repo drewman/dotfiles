@@ -922,6 +922,13 @@ Insert Jira ticket links with ease.
     (insert "[[https://jira.nike.com/browse/" ticket-number "][" ticket-number "]]"))
 #+end_src
 
+Open link with eww
+#+begin_src emacs-lisp
+  (defun my/org-open-link-at-point-with-eww ()
+    (interactive)
+    (let ((browse-url-browser-function 'eww-browse-url))
+      (org-open-at-point)))
+#+end_src
 *** Deft
 #+BEGIN_SRC emacs-lisp
   (use-package deft
